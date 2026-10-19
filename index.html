@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="emerald" data-mode="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner</title>
+  <meta name="description" content="A vibrant 30-day Quranic good deed curriculum and spiritual habit planner with monthly, weekly, daily focus, and yearly plans. Editable with custom daily reminders.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+</head>
+<body>
+
+  <!-- Celebration Canvas for Confetti & Stars -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#" class="brand-wrapper" id="brandLogo">
+        <div class="brand-logo-icon">🌙</div>
+        <div class="brand-text">
+          <h1>NurAl-Amal <span class="arabic-subtitle">نور العمل</span></h1>
+          <p>30 Days of Quranic Deeds & Habit Planner</p>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- Palette Switcher -->
+        <select class="select-clean" id="themeSelector" title="Choose Color Theme" aria-label="Color Palette">
+          <option value="emerald">🌿 Emerald Oasis</option>
+          <option value="sapphire">💎 Royal Sapphire</option>
+          <option value="amethyst">🔮 Velvet Amethyst</option>
+          <option value="sunset">🌅 Desert Sunset</option>
+        </select>
+
+        <!-- Dark / Light Mode Toggle -->
+        <button class="btn-icon" id="modeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle theme mode">
+          <span id="modeIcon">🌙</span>
+        </button>
+
+        <!-- Sound Audio FX Toggle -->
+        <button class="btn-icon" id="soundToggleBtn" title="Toggle Sound Chimes" aria-label="Toggle audio effects">
+          <span id="soundIcon">🔔</span>
+        </button>
+
+        <!-- Notification Bell & Reminders Button -->
+        <button class="btn-secondary" id="openRemindersBtn" title="Manage Daily Reminders">
+          <span>⏰</span> Reminders
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="container">
+
+    <!-- Hero Ribbon with Streak & Progress -->
+    <section class="hero-ribbon">
+      <div class="hero-grid">
+        <div class="hero-title-area">
+          <h2>Cultivate a <span>Pure Heart</span> Through the Quran</h2>
+          <p>One meaningful deed every single day, inspired by authentic Quranic wisdom. Track your journey across monthly, weekly, daily focus, and yearly plans.</p>
+        </div>
+
+        <!-- Quick Stats Chips -->
+        <div class="stats-card-group">
+          <div class="stat-chip" title="Consecutive days with completed deeds">
+            <div class="stat-icon streak">🔥</div>
+            <div class="stat-meta">
+              <div class="stat-val" id="streakVal">0 Days</div>
+              <div class="stat-label">Current Streak</div>
+            </div>
+          </div>
+
+          <div class="stat-chip" title="Deeds completed this month">
+            <div class="stat-icon progress">✨</div>
+            <div class="stat-meta">
+              <div class="stat-val" id="completedVal">0 / 30</div>
+              <div class="stat-label">Completed</div>
+            </div>
+          </div>
+
+          <div class="stat-chip" title="Percentage towards 30-day completion">
+            <div class="stat-icon count">🎯</div>
+            <div class="stat-meta">
+              <div class="stat-val" id="percentVal">0%</div>
+              <div class="stat-label">Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Month Progress Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-track" aria-label="Progress towards 30 days">
+          <div class="progress-fill" id="progressBarFill" style="width: 0%;"></div>
+        </div>
+        <div class="progress-text" id="progressStatusText">0% Complete</div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs for Plan Views -->
+    <section class="views-nav-wrapper">
+      <div class="views-nav">
+        <!-- View Tabs -->
+        <div class="tab-pills" role="tablist">
+          <button class="tab-btn active" role="tab" aria-selected="true" data-view="monthlyView" id="tabMonthly">
+            <span>📅</span> Monthly Plan
+          </button>
+          <button class="tab-btn" role="tab" aria-selected="false" data-view="weeklyView" id="tabWeekly">
+            <span>📆</span> Weekly Plan
+          </button>
+          <button class="tab-btn" role="tab" aria-selected="false" data-view="dailyView" id="tabDaily">
+            <span>☀️</span> Daily Focus Mode
+          </button>
+          <button class="tab-btn" role="tab" aria-selected="false" data-view="yearlyView" id="tabYearly">
+            <span>🌌</span> Yearly Virtues
+          </button>
+        </div>
+
+        <!-- Global Action Buttons -->
+        <div class="action-buttons-group">
+          <button class="btn-primary" id="openAddDeedBtn">
+            <span>➕</span> Add Custom Deed
+          </button>
+          <button class="btn-secondary" id="randomInspirationBtn" title="Deed of Inspiration">
+            <span>🎲</span> Random Inspiration
+          </button>
+          <button class="btn-secondary" id="exportDataBtn" title="Export Backup JSON">
+            <span>📤</span> Export
+          </button>
+          <button class="btn-secondary" id="importDataBtn" title="Import Backup JSON">
+            <span>📥</span> Import
+          </button>
+          <button class="btn-secondary" id="printPlanBtn" title="Print or Save as PDF">
+            <span>🖨️</span> Print PDF
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 1: Monthly Plan (30-Day Grid)
+         ==================================================================== -->
+    <section id="monthlyView" class="view-panel active">
+      <!-- Filter & Search Toolbar -->
+      <div class="filter-toolbar">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search by deed, keyword, or Surah...">
+        </div>
+
+        <div class="category-filter-chips" id="categoryFilterContainer">
+          <button class="filter-chip active" data-category="all">All Deeds</button>
+          <button class="filter-chip" data-category="Speech & Character">Speech</button>
+          <button class="filter-chip" data-category="Family & Kin">Family</button>
+          <button class="filter-chip" data-category="Charity & Giving">Charity</button>
+          <button class="filter-chip" data-category="Patience & Forgiveness">Patience</button>
+          <button class="filter-chip" data-category="Justice & Integrity">Justice</button>
+          <button class="filter-chip" data-category="Mercy & Community">Mercy</button>
+          <button class="filter-chip" data-category="Worship & Dhikr">Dhikr</button>
+          <button class="filter-chip" data-category="completed">Completed</button>
+          <button class="filter-chip" data-category="pending">Pending</button>
+        </div>
+      </div>
+
+      <!-- 30 Days Grid -->
+      <div class="monthly-grid" id="monthlyGrid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 2: Weekly Plan (Weekly Milestones & Habit Board)
+         ==================================================================== -->
+    <section id="weeklyView" class="view-panel">
+      <div class="weekly-container">
+        <!-- Week Switcher Tabs -->
+        <div class="week-selector-bar" id="weekSelectorBar">
+          <button class="week-tab-btn active" data-week="1">Week 1: Character Foundations (Days 1–7)</button>
+          <button class="week-tab-btn" data-week="2">Week 2: Compassion & Kinship (Days 8–14)</button>
+          <button class="week-tab-btn" data-week="3">Week 3: Justice & Sincerity (Days 15–21)</button>
+          <button class="week-tab-btn" data-week="4">Week 4: Community & Taqwa (Days 22–28)</button>
+          <button class="week-tab-btn" data-week="5">Days 29–30: Shukr & Continuity</button>
+        </div>
+
+        <!-- Week Thematic Hero Card -->
+        <div class="week-hero-card" id="weekHeroCard">
+          <div class="week-hero-info">
+            <h3 id="weekThemeTitle">Week 1: Character Foundations & Integrity</h3>
+            <p id="weekThemeDescription">Build the spiritual bedrock of your everyday life through truthful speech, kindness to parents, secret charity, and gracious forgiveness.</p>
+          </div>
+          <div class="week-stats-box">
+            <div class="circle-number" id="weekCompletedRatio">0/7</div>
+            <div class="stat-label">Deeds Done This Week</div>
+          </div>
+        </div>
+
+        <!-- Week Days List -->
+        <div class="week-days-table" id="weekDaysList">
+          <!-- Populated dynamically by app.js -->
+        </div>
+
+        <!-- Weekly Reflection Notebook -->
+        <div class="wisdom-box">
+          <h4>📝 Weekly Reflection & Habit Growth Notes</h4>
+          <p style="margin-bottom: 0.75rem;">Reflect on your spiritual struggles and triumphs this week. What virtue became easier to practice?</p>
+          <textarea class="journal-textarea" id="weeklyNotesInput" placeholder="Write your thoughts, feelings, and key learnings for this week..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 3: Daily Focus Mode (Immersive Deep-Dive)
+         ==================================================================== -->
+    <section id="dailyView" class="view-panel">
+      <div class="daily-focus-container">
+        <!-- Day Navigation Control -->
+        <div class="daily-nav-bar">
+          <button class="btn-secondary" id="prevDayBtn">← Previous Day</button>
+          <div class="day-title-pill" id="dailyNavTitle">Day 1 of 30</div>
+          <button class="btn-secondary" id="nextDayBtn">Next Day →</button>
+        </div>
+
+        <!-- Focused Single-Day Card -->
+        <div class="daily-focus-card" id="dailyFocusCard">
+          <div class="daily-header-meta">
+            <span class="day-badge" id="dailyBadge">Day 1</span>
+            <span class="category-tag emerald" id="dailyCategory">Speech & Character</span>
+            <button class="btn-mini" id="dailyEditTrigger">✏️ Edit Deed</button>
+            <button class="btn-mini" id="dailyAudioChimeBtn">🔔 Recite / Chime</button>
+          </div>
+
+          <h2 class="daily-focus-title" id="dailyTitle">Speak Kindly to All People</h2>
+
+          <!-- Ornate Calligraphy Box -->
+          <div class="arabic-ornate-frame">
+            <div class="arabic-large" id="dailyArabic">وَقُولُوا لِلنَّاسِ حُسْنًا</div>
+            <div class="ayah-citation-large" id="dailyRef">Surah Al-Baqarah (2:83)</div>
+          </div>
+
+          <!-- Translation -->
+          <div class="translation-large" id="dailyTranslation">
+            "And speak to people good [words]."
+          </div>
+
+          <!-- Spiritual Wisdom / Tafsir -->
+          <div class="wisdom-box">
+            <h4>📖 Quranic Wisdom & Reflection</h4>
+            <p id="dailyWisdom">Notice that Allah explicitly commanded kindness 'to people' (لِلنَّاسِ) without distinction of race, status, or belief. Dignified speech purifies the speaker before it benefits the listener.</p>
+          </div>
+
+          <!-- 3 Practical Micro-Tasks -->
+          <div class="micro-tasks-section">
+            <h4>✅ Daily Micro-Actions for Today</h4>
+            <div class="task-list" id="dailyTasksList">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Built-in Digital Tasbih Counter -->
+          <div class="tasbih-widget">
+            <div class="tasbih-title">📿 Digital Tasbih / Dhikr Companion</div>
+            <div class="tasbih-counter-display" id="tasbihDisplay" title="Click or tap to count">0</div>
+            <div class="tasbih-controls">
+              <button class="btn-tasbih-count" id="tasbihCountBtn">Count (Space)</button>
+              <button class="btn-secondary" id="tasbihResetBtn">Reset</button>
+              <select class="select-clean" id="tasbihTargetSelect">
+                <option value="33">Target: 33</option>
+                <option value="100">Target: 100</option>
+                <option value="999">Free Flow</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Daily Personal Journal -->
+          <div class="journal-section">
+            <h4 id="dailyJournalPrompt">📓 My Daily Reflection</h4>
+            <textarea class="journal-textarea" id="dailyJournalInput" placeholder="Write how you implemented this deed today, what barriers you encountered, or a heartfelt prayer..."></textarea>
+          </div>
+
+          <!-- Big Mark As Completed Button -->
+          <div style="margin-top: 1.75rem; text-align: center;">
+            <button class="btn-primary" id="dailyToggleCompleteBtn" style="padding: 0.85rem 2.5rem; font-size: 1.05rem;">
+              <span id="dailyCompleteIcon">✓</span> <span id="dailyCompleteText">Mark Day 1 as Completed</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 4: Yearly Virtues & Activity Heatmap
+         ==================================================================== -->
+    <section id="yearlyView" class="view-panel">
+      <div class="yearly-container">
+        <!-- 365-Day Activity Heatmap -->
+        <div class="yearly-heatmap-card">
+          <div class="yearly-heatmap-header">
+            <div>
+              <h3>365-Day Spiritual Consistency Heatmap</h3>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">Track your good deed habits throughout the full year</p>
+            </div>
+            <div class="stat-chip" style="padding: 0.4rem 0.8rem;">
+              <span style="font-weight: 700; color: var(--primary);" id="yearlyTotalActiveDays">0 Active Days</span>
+            </div>
+          </div>
+
+          <div class="heatmap-scroll-wrapper">
+            <div class="heatmap-grid" id="yearlyHeatmapGrid">
+              <!-- Dynamically generated 52 weeks x 7 days -->
+            </div>
+          </div>
+
+          <div class="heatmap-legend">
+            <span>Less</span>
+            <div class="heatmap-cell" style="background: var(--bg-subtle);"></div>
+            <div class="heatmap-cell" data-level="1"></div>
+            <div class="heatmap-cell" data-level="2"></div>
+            <div class="heatmap-cell" data-level="3"></div>
+            <div class="heatmap-cell" data-level="4"></div>
+            <span>More</span>
+          </div>
+        </div>
+
+        <!-- 12-Month Virtues Grid -->
+        <div>
+          <h3 style="margin-bottom: 0.5rem;">The 12-Month Quranic Virtues Roadmap</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Anchoring every month of your year with a foundational spiritual focus from the Quran.</p>
+
+          <div class="twelve-months-grid" id="twelveMonthsGrid">
+            <!-- Populated dynamically by app.js from data.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       MODAL 1: Edit Deed Modal (Modern <dialog closedby="any">)
+       ====================================================================== -->
+  <dialog id="editDeedModal" closedby="any" aria-labelledby="editModalTitle">
+    <div class="dialog-inner">
+      <div class="dialog-header">
+        <h3 id="editModalTitle">Edit Good Deed</h3>
+        <button class="dialog-close-btn" id="closeEditModalBtn" aria-label="Close dialog">✕</button>
+      </div>
+
+      <form id="editDeedForm">
+        <input type="hidden" id="editDeedId">
+
+        <div class="form-group">
+          <label class="form-label" for="editTitle">Deed Title / Action</label>
+          <input type="text" id="editTitle" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editCategory">Category</label>
+          <select id="editCategory" class="form-select">
+            <option value="Speech & Character">Speech & Character</option>
+            <option value="Family & Kin">Family & Kin</option>
+            <option value="Charity & Giving">Charity & Giving</option>
+            <option value="Patience & Forgiveness">Patience & Forgiveness</option>
+            <option value="Justice & Integrity">Justice & Integrity</option>
+            <option value="Mercy & Community">Mercy & Community</option>
+            <option value="Seeking Knowledge">Seeking Knowledge</option>
+            <option value="Worship & Dhikr">Worship & Dhikr</option>
+            <option value="Character & Peace">Character & Peace</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editArabic">Arabic Quranic Verse</label>
+          <input type="text" id="editArabic" class="form-input" style="direction: rtl; font-family: var(--font-arabic); font-size: 1.15rem;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editRef">Quranic Reference (Surah & Ayah)</label>
+          <input type="text" id="editRef" class="form-input" placeholder="e.g. Surah Al-Baqarah (2:83)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editTranslation">English Translation</label>
+          <textarea id="editTranslation" class="form-textarea" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editWisdom">Spiritual Wisdom & Tafsir Insight</label>
+          <textarea id="editWisdom" class="form-textarea" rows="3"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="resetDeedDefaultBtn">Reset to Default</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ======================================================================
+       MODAL 2: Daily Reminders & Notifications Manager
+       ====================================================================== -->
+  <dialog id="remindersModal" closedby="any" aria-labelledby="remindersModalTitle">
+    <div class="dialog-inner">
+      <div class="dialog-header">
+        <h3 id="remindersModalTitle">Daily Reminders & Alarms</h3>
+        <button class="dialog-close-btn" id="closeRemindersModalBtn" aria-label="Close dialog">✕</button>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          Configure customizable reminder notifications to alert you during the day for your daily good deed.
+        </p>
+        <button class="btn-secondary" id="requestNotificationPermissionBtn" style="width: 100%; justify-content: center;">
+          <span>🔔</span> Enable Browser Push Notifications
+        </button>
+      </div>
+
+      <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Active Reminders</h4>
+      <div class="reminders-list" id="remindersListContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Add New Daily Reminder</h4>
+      <form id="addReminderForm">
+        <div class="form-group">
+          <label class="form-label" for="newReminderTitle">Reminder Label</label>
+          <input type="text" id="newReminderTitle" class="form-input" placeholder="e.g. Midday Gratitude & Dhikr Check" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="newReminderTime">Time (24h)</label>
+            <input type="time" id="newReminderTime" class="form-input" value="12:00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newReminderFrequency">Frequency</label>
+            <select id="newReminderFrequency" class="form-select">
+              <option value="Daily">Daily</option>
+              <option value="Weekdays">Weekdays Only</option>
+              <option value="Fridays">Every Friday (Jum'ah)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+            <span>➕</span> Add Reminder
+          </button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ======================================================================
+       MODAL 3: Quick Detail & Share Modal
+       ====================================================================== -->
+  <dialog id="detailModal" closedby="any" aria-labelledby="detailModalTitle">
+    <div class="dialog-inner">
+      <div class="dialog-header">
+        <h3 id="detailModalTitle">Day Details</h3>
+        <button class="dialog-close-btn" id="closeDetailModalBtn" aria-label="Close dialog">✕</button>
+      </div>
+
+      <div id="detailModalBody">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="form-actions" style="margin-top: 1.5rem;">
+        <button type="button" class="btn-secondary" id="detailShareBtn">📋 Copy Shareable Card</button>
+        <button type="button" class="btn-primary" id="detailJumpFocusBtn">Open in Daily Focus Mode</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Hidden File Input for JSON Import -->
+  <input type="file" id="importFileInput" accept=".json" style="display: none;">
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ======================================================================
+       FOOTER (Mandatory Versioning & Automation Rule)
+       ====================================================================== -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <h4>NurAl-Amal (نور العمل)</h4>
+        <p>A lifelong companion for Quranic virtue, character perfection, and daily mindfulness.</p>
+      </div>
+
+      <div class="footer-center">
+        <!-- Semantic version placeholder adhering strictly to system rules -->
+        <div class="footer-version" id="footerVersionBadge">v1.0.0 (updated 2026-10-19 21:19)</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">
+          100% Private &amp; Offline. Data saved in LocalStorage.
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button class="btn-mini" id="resetAllDataBtn" title="Reset all progress to factory defaults">
+          ⚠️ Reset All Data
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
