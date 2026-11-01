@@ -7,6 +7,7 @@ const DEFAULT_DEEDS = [
   {
     id: 1,
     day: 1,
+    transliteration: "Wa qooloo lin-naasi husnaa",
     title: "Speak Kindly to All People",
     arabic: "وَقُولُوا لِلنَّاسِ حُسْنًا",
     reference: "Surah Al-Baqarah (2:83)",
@@ -30,6 +31,7 @@ const DEFAULT_DEEDS = [
   {
     id: 2,
     day: 2,
+    transliteration: "Wakhfid lahumaa janaahadh-dhulli minar-rahmati wa qur-rabbir-hamhumaa kamaa rabbayaanee sagheeraa",
     title: "Honor and Pray for Parents",
     arabic: "وَاخْفِضْ لَهُمَا جَنَاحَ الذُّلِّ مِنَ الرَّحْمَةِ وَقُل رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا",
     reference: "Surah Al-Isra (17:24)",
@@ -53,6 +55,7 @@ const DEFAULT_DEEDS = [
   {
     id: 3,
     day: 3,
+    transliteration: "In tubdoos-sadaqaati fa-ni'immaa hee; wa in tukhfoohaa wa tu'toohal-fuqaraa'a fahuwa khayrul-lakum",
     title: "Give Sincere Charity Discreetly",
     arabic: "إِن تُبْدُوا الصَّدَقَاتِ فَنِعِمَّا هِيَ ۖ وَإِن تُخْفُوهَا وَتُؤْتُوهَا الْفُقَرَاءَ فَهُوَ خَيْرٌ لَّكُمْ",
     reference: "Surah Al-Baqarah (2:271)",
@@ -76,6 +79,7 @@ const DEFAULT_DEEDS = [
   {
     id: 4,
     day: 4,
+    transliteration: "Faman 'afaa wa aslaha fa-ajruhoo 'alal-laah",
     title: "Pardon and Forgive from the Heart",
     arabic: "فَمَنْ عَفَا وَأَصْلَحَ فَأَجْرُهُ عَلَى اللَّهِ",
     reference: "Surah Ash-Shura (42:40)",
@@ -99,6 +103,7 @@ const DEFAULT_DEEDS = [
   {
     id: 5,
     day: 5,
+    transliteration: "Idfa' bil-latee hiya ahsanu fa-idhal-ladhee baynaka wa baynahoo 'adaawatun ka-annahoo waliyyun hameem",
     title: "Repel Unkindness with Beautiful Grace",
     arabic: "ادْفَعْ بِالَّتِي هِيَ أَحْسَنُ فَإِذَا الَّذِي بَيْنَكَ وَبَيْنَهُ عَدَاوَةٌ كَأَنَّهُ وَلِيٌّ حَمِيمٌ",
     reference: "Surah Fussilat (41:34)",
@@ -122,6 +127,7 @@ const DEFAULT_DEEDS = [
   {
     id: 6,
     day: 6,
+    transliteration: "Wa yut'imoonat-ta'aama 'alaa hubbihee miskeenanw-wa yateemanw-wa aseeraa",
     title: "Feed the Hungry and Share Food",
     arabic: "وَيُطْعِمُونَ الطَّعَامَ عَلَىٰ حُبِّهِ مِسْكِينًا وَيَتِيمًا وَأَسِيرًا",
     reference: "Surah Al-Insan (76:8)",
@@ -145,6 +151,7 @@ const DEFAULT_DEEDS = [
   {
     id: 7,
     day: 7,
+    transliteration: "Wal-ladheena hum li-amaanaatihim wa 'ahdihim raa'oon",
     title: "Honor Trusts and Keep Promises",
     arabic: "وَالَّذِينَ هُمْ لِأَمَانَاتِهِمْ وَعَهْدِهِمْ رَاعُونَ",
     reference: "Surah Al-Mu'minun (23:8)",
@@ -168,6 +175,7 @@ const DEFAULT_DEEDS = [
   {
     id: 8,
     day: 8,
+    transliteration: "Wa idhaa huyyeetum bi-tahiyyatin fahayyoo bi-ahsana minhaa aw ruddoohaa",
     title: "Greet with Warmth & Spread Peace",
     arabic: "وَإِذَا حُيِّيتُم بِتَحِيَّةٍ فَحَيُّوا بِأَحْسَنَ مِنْهَا أَوْ رُدُّوهَا",
     reference: "Surah An-Nisa (4:86)",
@@ -191,6 +199,7 @@ const DEFAULT_DEEDS = [
   {
     id: 9,
     day: 9,
+    transliteration: "Yaa ayyuhal-ladheena aamanuj-taniboo katheeram-minadh-dhanni inna ba'dadh-dhanni ithmunw-wa laa tajassasoo wa laa yaghtab ba'dukum ba'daa",
     title: "Cleanse Thoughts from Suspicion & Backbiting",
     arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا اجْتَنِبُوا كَثِيرًا مِّنَ الظَّنِّ إِنَّ بَعْضَ الظَّنِّ إِثْمٌ ۖ وَلَا تَجَسَّسُوا وَلَا يَغْتَب بَّعْضُكُم بَعْضًا",
     reference: "Surah Al-Hujurat (49:12)",
@@ -214,6 +223,7 @@ const DEFAULT_DEEDS = [
   {
     id: 10,
     day: 10,
+    transliteration: "Fa-ammal-yateema falaa taqhar",
     title: "Comfort and Shield the Vulnerable",
     arabic: "فَأَمَّا الْيَتِيمَ فَلَا تَقْهَرْ",
     reference: "Surah Ad-Duha (93:9)",
@@ -237,6 +247,7 @@ const DEFAULT_DEEDS = [
   {
     id: 11,
     day: 11,
+    transliteration: "Innamal-mu'minoona ikhwatun fa-aslihoo bayna akhawaykum",
     title: "Reconcile Strained Hearts",
     arabic: "إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا بَيْنَ أَخَوَيْكُمْ",
     reference: "Surah Al-Hujurat (49:10)",
@@ -260,6 +271,7 @@ const DEFAULT_DEEDS = [
   {
     id: 12,
     day: 12,
+    transliteration: "La-in shakartum la-azeedannakum",
     title: "Count Blessings & Express Shukr",
     arabic: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
     reference: "Surah Ibrahim (14:7)",
@@ -283,6 +295,7 @@ const DEFAULT_DEEDS = [
   {
     id: 13,
     day: 13,
+    transliteration: "Wa 'ibaadur-Rahmaanil-ladheena yamshoona 'alal-ardi hawnanw-wa idhaa khaatabahumul-jaahiloona qaaloo salaamaa",
     title: "Walk Upon the Earth with Humility",
     arabic: "وَعِبَادُ الرَّحْمَٰنِ الَّذِينَ يَمْشُونَ عَلَى الْأَرْضِ هَوْنًا وَإِذَا خَاطَبَهُمُ الْجَاهِلُونَ قَالُوا سَلَامًا",
     reference: "Surah Al-Furqan (25:63)",
@@ -306,6 +319,7 @@ const DEFAULT_DEEDS = [
   {
     id: 14,
     day: 14,
+    transliteration: "Wal-kaadhimeenal-ghaydha wal-'aafeena 'anin-naas; wal-laahu yuhibbul-muhsineen",
     title: "Restrain Anger and Show Grace",
     arabic: "وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ ۗ وَاللَّهُ يُحِبُّ الْمُحْسِنِينَ",
     reference: "Surah Ali 'Imran (3:134)",
@@ -329,6 +343,7 @@ const DEFAULT_DEEDS = [
   {
     id: 15,
     day: 15,
+    transliteration: "Yaa ayyuhal-ladheena aamanoo koonoo qawwaameena bil-qisti shuhadaa'a lillaahi wa law 'alaa anfusikum",
     title: "Stand for Justice with Integrity",
     arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا كُونُوا قَوَّامِينَ بِالْقِسْطِ شُهَدَاءَ لِلَّهِ وَلَوْ عَلَىٰ أَنفُسِكُمْ",
     reference: "Surah An-Nisa (4:135)",
@@ -352,6 +367,7 @@ const DEFAULT_DEEDS = [
   {
     id: 16,
     day: 16,
+    transliteration: "Wa awful-kayla idhaa kiltum wazinoo bil-qistaasil-mustaqeem",
     title: "Give Full Measure and Fair Dealing",
     arabic: "وَأَوْفُوا الْكَيْلَ إِذَا كِلْتُمْ وَزِنُوا بِالْقِسْطَاسِ الْمُسْتَقِيمِ",
     reference: "Surah Al-Isra (17:35)",
@@ -375,6 +391,7 @@ const DEFAULT_DEEDS = [
   {
     id: 17,
     day: 17,
+    transliteration: "Wa qur-Rabbi zidnee 'ilmaa",
     title: "Ask for Increase in Beneficial Knowledge",
     arabic: "وَقُل رَّبِّ زِدْنِي عِلْمًا",
     reference: "Surah Ta-Ha (20:114)",
@@ -398,6 +415,7 @@ const DEFAULT_DEEDS = [
   {
     id: 18,
     day: 18,
+    transliteration: "Wa tawaasaw bis-sabri wa tawaasaw bil-marhamah",
     title: "Encourage One Another in Patience & Mercy",
     arabic: "وَتَوَاصَوْا بِالصَّبْرِ وَتَوَاصَوْا بِالْمَرْحَمَةِ",
     reference: "Surah Al-Balad (90:17)",
@@ -421,6 +439,7 @@ const DEFAULT_DEEDS = [
   {
     id: 19,
     day: 19,
+    transliteration: "Wa in kaana dhoo 'usratin fanadhiratun ilaa maysarah; wa an tasaddaqoo khayrul-lakum",
     title: "Relieve Someone's Hardship or Debt",
     arabic: "وَإِن كَانَ ذُو عُسْرَةٍ فَنَظِرَةٌ إِلَىٰ مَيْسَرَةٍ ۚ وَأَن تَصَدَّقُوا خَيْرٌ لَّكُمْ",
     reference: "Surah Al-Baqarah (2:280)",
@@ -444,6 +463,7 @@ const DEFAULT_DEEDS = [
   {
     id: 20,
     day: 20,
+    transliteration: "Alaa bi-dhikril-laahi tatma'innul-quloob",
     title: "Tranquilize Your Heart with Dhikr",
     arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
     reference: "Surah Ar-Ra'd (13:28)",
@@ -467,6 +487,7 @@ const DEFAULT_DEEDS = [
   {
     id: 21,
     day: 21,
+    transliteration: "Laa yaskhar qawmum-min qawmin 'asaa ay-yakoonoo khayram-minhum",
     title: "Never Mock or Belittle Anyone",
     arabic: "لَا يَسْخَرْ قَوْمٌ مِّن قَوْمٍ عَسَىٰ أَن يَكُونُوا خَيْرًا مِّنْهُمْ",
     reference: "Surah Al-Hujurat (49:11)",
@@ -490,6 +511,7 @@ const DEFAULT_DEEDS = [
   {
     id: 22,
     day: 22,
+    transliteration: "Wa ta'aawanoo 'alal-birri wat-taqwaa wa laa ta'aawanoo 'alal-ithmi wal-'udwaan",
     title: "Cooperate in Righteousness & Goodness",
     arabic: "وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ ۖ وَلَا تَعَاوَنُوا عَلَى الْإِثْمِ وَالْعُدْوَانِ",
     reference: "Surah Al-Ma'idah (5:2)",
@@ -513,6 +535,7 @@ const DEFAULT_DEEDS = [
   {
     id: 23,
     day: 23,
+    transliteration: "Qul yaa 'ibaadiyal-ladheena asrafoo 'alaa anfusihim laa taqnatoo mir-rahmatil-laah",
     title: "Seek Forgiveness with Sincere Hope",
     arabic: "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ",
     reference: "Surah Az-Zumar (39:53)",
@@ -536,6 +559,7 @@ const DEFAULT_DEEDS = [
   {
     id: 24,
     day: 24,
+    transliteration: "Wattaqul-laahal-ladhee tasaa'aloona bihee wal-arhaam",
     title: "Strengthen Ties of Kinship (Silat ar-Rahim)",
     arabic: "وَاتَّقُوا اللَّهَ الَّذِي تَسَاءَلُونَ بِهِ وَالْأَرْحَامَ",
     reference: "Surah An-Nisa (4:1)",
@@ -559,6 +583,7 @@ const DEFAULT_DEEDS = [
   {
     id: 25,
     day: 25,
+    transliteration: "Rabbanaa hab lanaa min azwaajinaa wa dhurriyyatinaa qurrata a'yuninw-waj'alnaa lil-muttaqeena imaamaa",
     title: "Pray for Families & Righteous Leaders",
     arabic: "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
     reference: "Surah Al-Furqan (25:74)",
@@ -582,6 +607,7 @@ const DEFAULT_DEEDS = [
   {
     id: 26,
     day: 26,
+    transliteration: "Wa kuloo washraoboo wa laa tusrifoo; innahoo laa yuhibbul-musrifeen",
     title: "Practice Moderation & Eliminate Waste",
     arabic: "وَكُلُوا وَاشْرَبُوا وَلَا تُسْرِفُوا ۚ إِنَّهُ لَا يُحِبُّ الْمُسْرِفِينَ",
     reference: "Surah Al-A'raf (7:31)",
@@ -605,6 +631,7 @@ const DEFAULT_DEEDS = [
   {
     id: 27,
     day: 27,
+    transliteration: "Innallaaha ya'muru bil-'adli wal-ihsaan",
     title: "Strive for Ihsan (Excellence in Everything)",
     arabic: "إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ",
     reference: "Surah An-Nahl (16:90)",
@@ -628,6 +655,7 @@ const DEFAULT_DEEDS = [
   {
     id: 28,
     day: 28,
+    transliteration: "Wa qaala Rabbukumud-'oonee astajib lakum",
     title: "Call Upon Allah with Complete Certainty",
     arabic: "وَقَالَ رَبُّكُمُ ادْعُونِي أَسْتَجِبْ لَكُمْ",
     reference: "Surah Ghafir (40:60)",
@@ -651,6 +679,7 @@ const DEFAULT_DEEDS = [
   {
     id: 29,
     day: 29,
+    transliteration: "Wa laa tufsidoo fil-ardi ba'da islaahihaa",
     title: "Protect Creation & Do No Harm",
     arabic: "وَلَا تُفْسِدُوا فِي الْأَرْضِ بَعْدَ إِصْلَاحِهَا",
     reference: "Surah Al-A'raf (7:56)",
@@ -674,6 +703,7 @@ const DEFAULT_DEEDS = [
   {
     id: 30,
     day: 30,
+    transliteration: "Fasabbih bihamdi Rabbika wastaghfirh; innahoo kaana tawwaabaa",
     title: "Celebrate with Praise, Gratitude & Istighfar",
     arabic: "فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ ۚ إِنَّهُ كَانَ تَوَّابًا",
     reference: "Surah An-Nasr (110:3)",

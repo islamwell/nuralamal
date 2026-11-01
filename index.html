@@ -45,7 +45,7 @@
 
         <!-- Notification Bell & Reminders Button -->
         <button class="btn-secondary" id="openRemindersBtn" title="Manage Daily Reminders">
-          <span>⏰</span> Reminders
+          <span>⏰</span> Reminders <span id="nextReminderPill" style="font-size: 0.72rem; background: var(--bg-subtle); padding: 0.15rem 0.5rem; border-radius: var(--radius-full); margin-left: 0.25rem;">Next: --:--</span>
         </button>
       </div>
     </div>
@@ -148,19 +148,21 @@
         <div class="search-input-wrapper">
           <span class="search-icon">🔍</span>
           <input type="text" id="searchInput" class="search-input" placeholder="Search by deed, keyword, or Surah...">
+          <button type="button" id="clearSearchBtn" class="btn-clear-search" title="Clear Search">✕</button>
+          <span id="searchResultsCount" class="search-results-counter"></span>
         </div>
 
         <div class="category-filter-chips" id="categoryFilterContainer">
-          <button class="filter-chip active" data-category="all">All Deeds</button>
-          <button class="filter-chip" data-category="Speech & Character">Speech</button>
-          <button class="filter-chip" data-category="Family & Kin">Family</button>
-          <button class="filter-chip" data-category="Charity & Giving">Charity</button>
-          <button class="filter-chip" data-category="Patience & Forgiveness">Patience</button>
-          <button class="filter-chip" data-category="Justice & Integrity">Justice</button>
-          <button class="filter-chip" data-category="Mercy & Community">Mercy</button>
-          <button class="filter-chip" data-category="Worship & Dhikr">Dhikr</button>
-          <button class="filter-chip" data-category="completed">Completed</button>
-          <button class="filter-chip" data-category="pending">Pending</button>
+          <button class="filter-chip active" data-category="all">All Deeds <span class="filter-chip-count" id="count-all">30</span></button>
+          <button class="filter-chip" data-category="Speech & Character">Speech <span class="filter-chip-count" id="count-speech">5</span></button>
+          <button class="filter-chip" data-category="Family & Kin">Family <span class="filter-chip-count" id="count-family">3</span></button>
+          <button class="filter-chip" data-category="Charity & Giving">Charity <span class="filter-chip-count" id="count-charity">4</span></button>
+          <button class="filter-chip" data-category="Patience & Forgiveness">Patience <span class="filter-chip-count" id="count-patience">2</span></button>
+          <button class="filter-chip" data-category="Justice & Integrity">Justice <span class="filter-chip-count" id="count-justice">3</span></button>
+          <button class="filter-chip" data-category="Mercy & Community">Mercy <span class="filter-chip-count" id="count-mercy">4</span></button>
+          <button class="filter-chip" data-category="Worship & Dhikr">Dhikr <span class="filter-chip-count" id="count-dhikr">5</span></button>
+          <button class="filter-chip" data-category="completed">Completed <span class="filter-chip-count" id="count-completed">0</span></button>
+          <button class="filter-chip" data-category="pending">Pending <span class="filter-chip-count" id="count-pending">30</span></button>
         </div>
       </div>
 
@@ -234,9 +236,33 @@
           <h2 class="daily-focus-title" id="dailyTitle">Speak Kindly to All People</h2>
 
           <!-- Ornate Calligraphy Box -->
-          <div class="arabic-ornate-frame">
+          <div class="arabic-ornate-frame" id="dailyArabicFrame">
             <div class="arabic-large" id="dailyArabic">وَقُولُوا لِلنَّاسِ حُسْنًا</div>
             <div class="ayah-citation-large" id="dailyRef">Surah Al-Baqarah (2:83)</div>
+          </div>
+
+          <!-- Ayah Memorization Assistant (Easy to Remember) -->
+          <div class="memorize-assistant-box" id="memorizeAssistantBox">
+            <div class="memorize-header">
+              <h4><span>🧠</span> Ayah Memorization &amp; Audio Assistant</h4>
+              <div class="memorize-actions">
+                <button type="button" class="memorize-btn" id="voiceReadoutBtn" title="Listen to Voice Recitation">
+                  <span>🔊</span> Listen Voice
+                </button>
+                <button type="button" class="memorize-btn" id="toggleHideArabicBtn" title="Hide/Reveal Arabic for testing recall">
+                  <span>👁️</span> Hide Arabic
+                </button>
+                <button type="button" class="memorize-btn" id="toggleHideTransBtn" title="Hide/Reveal Translation">
+                  <span>👁️</span> Hide Meaning
+                </button>
+              </div>
+            </div>
+            <div class="memorize-transliteration" id="dailyTransliteration">
+              Wa qooloo lin-naasi husnaa
+            </div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">
+              💡 <em>Tip: Use the buttons above to test your recall or listen to spoken translation.</em>
+            </p>
           </div>
 
           <!-- Translation -->
@@ -258,10 +284,28 @@
             </div>
           </div>
 
-          <!-- Built-in Digital Tasbih Counter -->
+          <!-- Built-in Digital Tasbih Counter (Enhanced) -->
           <div class="tasbih-widget">
-            <div class="tasbih-title">📿 Digital Tasbih / Dhikr Companion</div>
+            <div class="tasbih-top-row">
+              <div class="tasbih-title">📿 Digital Tasbih Companion</div>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <select class="tasbih-phrase-select" id="tasbihPhraseSelect" title="Select Dhikr Phrase">
+                  <option value="SubhanAllah">سُبْحَانَ اللَّهِ (SubhanAllah)</option>
+                  <option value="Alhamdulillah">الْحَمْدُ لِلَّهِ (Alhamdulillah)</option>
+                  <option value="AllahuAkbar">اللَّهُ أَكْبَرُ (Allahu Akbar)</option>
+                  <option value="Astaghfirullah">أَسْتَغْفِرُ اللَّهَ (Astaghfirullah)</option>
+                  <option value="LaIlahaIllallah">لَا إِلَٰهَ إِلَّا اللَّهُ (La ilaha illallah)</option>
+                </select>
+                <span class="tasbih-round-badge" id="tasbihRoundBadge">Round 1</span>
+              </div>
+            </div>
+
             <div class="tasbih-counter-display" id="tasbihDisplay" title="Click or tap to count">0</div>
+
+            <div class="tasbih-progress-bar" title="Target Progress">
+              <div class="tasbih-progress-fill" id="tasbihProgressFill" style="width: 0%;"></div>
+            </div>
+
             <div class="tasbih-controls">
               <button class="btn-tasbih-count" id="tasbihCountBtn">Count (Space)</button>
               <button class="btn-secondary" id="tasbihResetBtn">Reset</button>
@@ -279,11 +323,19 @@
             <textarea class="journal-textarea" id="dailyJournalInput" placeholder="Write how you implemented this deed today, what barriers you encountered, or a heartfelt prayer..."></textarea>
           </div>
 
-          <!-- Big Mark As Completed Button -->
+          <!-- Big Mark As Completed Button & Social Share Group -->
           <div style="margin-top: 1.75rem; text-align: center;">
             <button class="btn-primary" id="dailyToggleCompleteBtn" style="padding: 0.85rem 2.5rem; font-size: 1.05rem;">
               <span id="dailyCompleteIcon">✓</span> <span id="dailyCompleteText">Mark Day 1 as Completed</span>
             </button>
+
+            <!-- Quick Share Options -->
+            <div class="share-actions-group" style="justify-content: center;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">Share Virtue:</span>
+              <button type="button" class="btn-share" id="dailyCopyShareBtn">📋 Copy Card</button>
+              <a href="#" class="btn-share whatsapp" id="dailyWhatsappShareBtn" target="_blank" rel="noopener">💬 WhatsApp</a>
+              <a href="#" class="btn-share telegram" id="dailyTelegramShareBtn" target="_blank" rel="noopener">✈️ Telegram</a>
+            </div>
           </div>
         </div>
       </div>
@@ -350,24 +402,30 @@
       <form id="editDeedForm">
         <input type="hidden" id="editDeedId">
 
-        <div class="form-group">
-          <label class="form-label" for="editTitle">Deed Title / Action</label>
-          <input type="text" id="editTitle" class="form-input" required>
+        <div style="display: grid; grid-template-columns: 100px 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label" for="editDay">Day #</label>
+            <input type="number" id="editDay" class="form-input" min="1" max="30" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="editCategory">Category</label>
+            <select id="editCategory" class="form-select">
+              <option value="Speech & Character">Speech & Character</option>
+              <option value="Family & Kin">Family & Kin</option>
+              <option value="Charity & Giving">Charity & Giving</option>
+              <option value="Patience & Forgiveness">Patience & Forgiveness</option>
+              <option value="Justice & Integrity">Justice & Integrity</option>
+              <option value="Mercy & Community">Mercy & Community</option>
+              <option value="Seeking Knowledge">Seeking Knowledge</option>
+              <option value="Worship & Dhikr">Worship & Dhikr</option>
+              <option value="Character & Peace">Character & Peace</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="editCategory">Category</label>
-          <select id="editCategory" class="form-select">
-            <option value="Speech & Character">Speech & Character</option>
-            <option value="Family & Kin">Family & Kin</option>
-            <option value="Charity & Giving">Charity & Giving</option>
-            <option value="Patience & Forgiveness">Patience & Forgiveness</option>
-            <option value="Justice & Integrity">Justice & Integrity</option>
-            <option value="Mercy & Community">Mercy & Community</option>
-            <option value="Seeking Knowledge">Seeking Knowledge</option>
-            <option value="Worship & Dhikr">Worship & Dhikr</option>
-            <option value="Character & Peace">Character & Peace</option>
-          </select>
+          <label class="form-label" for="editTitle">Deed Title / Action</label>
+          <input type="text" id="editTitle" class="form-input" required>
         </div>
 
         <div class="form-group">
@@ -388,6 +446,17 @@
         <div class="form-group">
           <label class="form-label" for="editWisdom">Spiritual Wisdom & Tafsir Insight</label>
           <textarea id="editWisdom" class="form-textarea" rows="3"></textarea>
+        </div>
+
+        <!-- Customizable Micro-Actions Checklist -->
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label class="form-label" style="margin-bottom: 0;">Daily Action Checklist Items</label>
+            <button type="button" class="btn-mini" id="addEditActionItemBtn">➕ Add Step</button>
+          </div>
+          <div id="editActionItemsList">
+            <!-- Rendered dynamically -->
+          </div>
         </div>
 
         <div class="form-actions">
@@ -412,9 +481,14 @@
         <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">
           Configure customizable reminder notifications to alert you during the day for your daily good deed.
         </p>
-        <button class="btn-secondary" id="requestNotificationPermissionBtn" style="width: 100%; justify-content: center;">
-          <span>🔔</span> Enable Browser Push Notifications
-        </button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+          <button class="btn-secondary" id="requestNotificationPermissionBtn" style="justify-content: center;">
+            <span>🔔</span> Push Alerts
+          </button>
+          <button class="btn-secondary" id="testReminderSoundBtn" style="justify-content: center;">
+            <span>🎵</span> Test Sound
+          </button>
+        </div>
       </div>
 
       <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem;">Active Reminders</h4>
@@ -474,6 +548,16 @@
     </div>
   </dialog>
 
+  <!-- In-App Floating Alarm Banner -->
+  <div class="alarm-banner" id="inAppAlarmBanner" role="alert">
+    <div class="alarm-icon">🕌</div>
+    <div class="alarm-content">
+      <h5 id="alarmBannerTitle">Daily Deed Reminder</h5>
+      <p id="alarmBannerText">It is time for your daily Quranic reflection and deed!</p>
+    </div>
+    <button type="button" class="btn-secondary" id="dismissAlarmBannerBtn" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">Dismiss</button>
+  </div>
+
   <!-- Hidden File Input for JSON Import -->
   <input type="file" id="importFileInput" accept=".json" style="display: none;">
 
@@ -492,7 +576,7 @@
 
       <div class="footer-center">
         <!-- Semantic version placeholder adhering strictly to system rules -->
-        <div class="footer-version" id="footerVersionBadge">v1.0.0 (updated 2026-10-19 21:19)</div>
+        <div class="footer-version" id="footerVersionBadge">v1.0.1 (updated 2026-11-01 22:18)</div>
         <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">
           100% Private &amp; Offline. Data saved in LocalStorage.
         </div>

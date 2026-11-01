@@ -1,6 +1,7 @@
 // ============================================================================
 // NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner
 // Core Application Logic & Modern Web Interactions
+// Version 1.0.1 (updated 2026-11-01 22:18)
 // ============================================================================
 
 (function() {
@@ -17,6 +18,8 @@
     MODE: 'nuralamal_mode_v1',
     SOUND: 'nuralamal_sound_v1',
     TASBIH: 'nuralamal_tasbih_v1',
+    TASBIH_PHRASE: 'nuralamal_tasbih_phrase_v1',
+    TASBIH_ROUNDS: 'nuralamal_tasbih_rounds_v1',
     ACTIVE_DAY: 'nuralamal_active_day_v1'
   };
 
@@ -31,6 +34,8 @@
     selectedCategory: 'all',
     tasbihCount: 0,
     tasbihTarget: 33,
+    tasbihPhrase: 'SubhanAllah',
+    tasbihRounds: 1,
     soundEnabled: true,
     theme: 'emerald',
     mode: 'light'
@@ -61,7 +66,7 @@
       if (!ctx) return;
 
       const now = ctx.currentTime;
-      // Beautiful harmonic chord (E5, G#5, B5, E6)
+      // Harmonic reflection chord (E5, G#5, B5, E6)
       const frequencies = [659.25, 830.61, 987.77, 1318.51];
 
       frequencies.forEach((freq, idx) => {
@@ -208,26 +213,24 @@
 
   // --------------------------------------------------------------------------
   // Modern Web Guidance: Native Dialog closedby Fallback
+  // (Pointerdown + pointerup coordinate check preventing false backdrop drags)
   // --------------------------------------------------------------------------
   function setupDialogFallbacks() {
-    const dialogs = document.querySelectorAll('dialog');
-    dialogs.forEach(dialog => {
-      // Fallback for browsers without native closedBy support
-      if (!('closedBy' in HTMLDialogElement.prototype)) {
-        dialog.addEventListener('click', (event) => {
-          if (event.target !== dialog) return;
-          const rect = dialog.getBoundingClientRect();
-          const isDialogContent = (
-            rect.top <= event.clientY &&
-            event.clientY <= rect.top + rect.height &&
-            rect.left <= event.clientX &&
-            event.clientX <= rect.left + rect.width
-          );
-          if (isDialogContent) return;
-          dialog.close();
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      const outside = (e, dialog) => {
+        const r = dialog.getBoundingClientRect();
+        return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      };
+      for (const dialog of document.querySelectorAll('dialog[closedby="any"]')) {
+        let pressedOutside = false;
+        dialog.addEventListener('pointerdown', (e) => { pressedOutside = outside(e, dialog); });
+        dialog.addEventListener('pointerup', (e) => {
+          if (pressedOutside && outside(e, dialog)) {
+            dialog.close();
+          }
         });
       }
-    });
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -244,6 +247,19 @@
     } catch (e) {
       console.error('Failed to parse deeds from storage, using defaults:', e);
       state.deeds = JSON.parse(JSON.stringify(DEFAULT_DEEDS));
+    }
+
+    // Ensure all deeds have transliteration & valid actionItems
+    if (typeof DEFAULT_DEEDS !== 'undefined') {
+      state.deeds.forEach(d => {
+        if (!d.transliteration) {
+          const def = DEFAULT_DEEDS.find(item => item.id === d.id);
+          if (def && def.transliteration) d.transliteration = def.transliteration;
+        }
+        if (!d.actionItems || !Array.isArray(d.actionItems)) {
+          d.actionItems = [{ id: `${d.id}-1`, text: d.title, done: false }];
+        }
+      });
     }
 
     try {
@@ -273,6 +289,8 @@
     state.mode = localStorage.getItem(STORAGE_KEYS.MODE) || 'light';
     state.soundEnabled = localStorage.getItem(STORAGE_KEYS.SOUND) !== 'false';
     state.tasbihCount = parseInt(localStorage.getItem(STORAGE_KEYS.TASBIH) || '0', 10);
+    state.tasbihPhrase = localStorage.getItem(STORAGE_KEYS.TASBIH_PHRASE) || 'SubhanAllah';
+    state.tasbihRounds = parseInt(localStorage.getItem(STORAGE_KEYS.TASBIH_ROUNDS) || '1', 10);
 
     const savedActiveDay = parseInt(localStorage.getItem(STORAGE_KEYS.ACTIVE_DAY) || '0', 10);
     if (savedActiveDay >= 1 && savedActiveDay <= 30) {
@@ -293,6 +311,7 @@
       console.error('Failed to save deeds:', e);
     }
     updateHeroStats();
+    updateCategoryCountBadges();
   }
 
   function saveReminders() {
@@ -301,6 +320,7 @@
     } catch (e) {
       console.error('Failed to save reminders:', e);
     }
+    updateNextReminderIndicator();
   }
 
   function saveWeeklyNotes() {
@@ -346,7 +366,7 @@
   }
 
   // --------------------------------------------------------------------------
-  // Hero Statistics & Streak Calculator
+  // Hero Statistics & Robust Streak Calculator
   // --------------------------------------------------------------------------
   function updateHeroStats() {
     const completedCount = state.deeds.filter(d => d.completed).length;
@@ -365,26 +385,61 @@
     const progressStatusText = document.getElementById('progressStatusText');
     if (progressStatusText) progressStatusText.textContent = `${percent}% Complete`;
 
-    // Calculate streak
+    // Robust streak calculation
     const streak = calculateStreak();
     const streakVal = document.getElementById('streakVal');
     if (streakVal) streakVal.textContent = `${streak} ${streak === 1 ? 'Day' : 'Days'}`;
 
-    // Update active day button state if Daily View is visible
     updateDailyViewElements();
   }
 
   function calculateStreak() {
-    let streak = 0;
-    // Count consecutive completed days starting from day 1 up to today
+    let maxRun = 0;
+    let currentRun = 0;
+
     for (let i = 0; i < state.deeds.length; i++) {
       if (state.deeds[i].completed) {
-        streak++;
+        currentRun++;
+        if (currentRun > maxRun) maxRun = currentRun;
       } else {
+        currentRun = 0;
+      }
+    }
+
+    let latestRun = 0;
+    for (let i = state.deeds.length - 1; i >= 0; i--) {
+      if (state.deeds[i].completed) {
+        latestRun++;
+      } else if (latestRun > 0) {
         break;
       }
     }
-    return streak;
+
+    return Math.max(latestRun, maxRun);
+  }
+
+  function updateCategoryCountBadges() {
+    const total = state.deeds.length;
+    const completed = state.deeds.filter(d => d.completed).length;
+    const pending = total - completed;
+
+    const countMap = {
+      'count-all': total,
+      'count-speech': state.deeds.filter(d => d.category === 'Speech & Character').length,
+      'count-family': state.deeds.filter(d => d.category === 'Family & Kin').length,
+      'count-charity': state.deeds.filter(d => d.category === 'Charity & Giving').length,
+      'count-patience': state.deeds.filter(d => d.category === 'Patience & Forgiveness').length,
+      'count-justice': state.deeds.filter(d => d.category === 'Justice & Integrity').length,
+      'count-mercy': state.deeds.filter(d => d.category === 'Mercy & Community').length,
+      'count-dhikr': state.deeds.filter(d => d.category === 'Worship & Dhikr').length,
+      'count-completed': completed,
+      'count-pending': pending
+    };
+
+    Object.keys(countMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = countMap[id];
+    });
   }
 
   // --------------------------------------------------------------------------
@@ -399,6 +454,12 @@
     const query = state.searchQuery.toLowerCase().trim();
     const filterCat = state.selectedCategory;
 
+    // Show/hide search clear button
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) {
+      clearBtn.style.display = query ? 'block' : 'none';
+    }
+
     const filtered = state.deeds.filter(deed => {
       // Category filter
       if (filterCat === 'completed' && !deed.completed) return false;
@@ -409,12 +470,12 @@
 
       // Search query
       if (query) {
-        const matchTitle = deed.title.toLowerCase().includes(query);
-        const matchRef = deed.reference.toLowerCase().includes(query);
-        const matchTrans = deed.translation.toLowerCase().includes(query);
-        const matchArabic = deed.arabic.toLowerCase().includes(query);
-        const matchWisdom = deed.wisdom.toLowerCase().includes(query);
-        const matchCategory = deed.category.toLowerCase().includes(query);
+        const matchTitle = (deed.title || '').toLowerCase().includes(query);
+        const matchRef = (deed.reference || '').toLowerCase().includes(query);
+        const matchTrans = (deed.translation || '').toLowerCase().includes(query);
+        const matchArabic = (deed.arabic || '').toLowerCase().includes(query);
+        const matchWisdom = (deed.wisdom || '').toLowerCase().includes(query);
+        const matchCategory = (deed.category || '').toLowerCase().includes(query);
         if (!matchTitle && !matchRef && !matchTrans && !matchArabic && !matchWisdom && !matchCategory) {
           return false;
         }
@@ -422,6 +483,16 @@
 
       return true;
     });
+
+    // Update search results count indicator
+    const counterEl = document.getElementById('searchResultsCount');
+    if (counterEl) {
+      if (query || filterCat !== 'all') {
+        counterEl.textContent = `Showing ${filtered.length} of ${state.deeds.length}`;
+      } else {
+        counterEl.textContent = '';
+      }
+    }
 
     if (filtered.length === 0) {
       grid.innerHTML = `
@@ -473,7 +544,6 @@
         </div>
       `;
 
-      // Event Listeners on Card
       card.addEventListener('click', (e) => {
         const target = e.target.closest('[data-action]');
         if (!target) return;
@@ -633,8 +703,17 @@
     const trans = document.getElementById('dailyTranslation');
     if (trans) trans.textContent = `"${deed.translation}"`;
 
+    const transliteration = document.getElementById('dailyTransliteration');
+    if (transliteration) {
+      transliteration.textContent = deed.transliteration || 'Recite with reverence and presence.';
+    }
+
     const wisdom = document.getElementById('dailyWisdom');
     if (wisdom) wisdom.textContent = deed.wisdom;
+
+    // Reset blur filters
+    document.getElementById('dailyArabicFrame')?.classList.remove('hidden-blur');
+    document.getElementById('dailyTranslation')?.classList.remove('hidden-blur');
 
     // Render 3 Micro-tasks
     const tasksList = document.getElementById('dailyTasksList');
@@ -657,7 +736,6 @@
           itemEl.classList.toggle('done', item.done);
           saveDeeds();
 
-          // If all micro-tasks are done, celebrate and suggest completion
           if (deed.actionItems.every(t => t.done) && !deed.completed) {
             playChimeSound();
             showToast('All daily micro-actions checked off!', '🎯');
@@ -674,7 +752,31 @@
       journalInput.value = deed.userNotes || '';
     }
 
+    // Setup social share links for current deed
+    setupDailyShareLinks(deed);
+
     updateDailyViewElements();
+  }
+
+  function setupDailyShareLinks(deed) {
+    const shareText = `🌙 NurAl-Amal — Day ${deed.day}: ${deed.title}\n\n"${deed.arabic}"\n${deed.reference}\n\n"${deed.translation}"\n\nKey Deed: ${deed.actionItems?.[0]?.text || ''}`;
+    const encodedText = encodeURIComponent(shareText);
+
+    const waBtn = document.getElementById('dailyWhatsappShareBtn');
+    if (waBtn) waBtn.href = `https://api.whatsapp.com/send?text=${encodedText}`;
+
+    const tgBtn = document.getElementById('dailyTelegramShareBtn');
+    if (tgBtn) tgBtn.href = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodedText}`;
+
+    const copyBtn = document.getElementById('dailyCopyShareBtn');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(shareText);
+          showToast('Shareable card copied to clipboard!', '📋');
+        }
+      };
+    }
   }
 
   function updateDailyViewElements() {
@@ -707,24 +809,51 @@
   }
 
   // --------------------------------------------------------------------------
-  // VIEW 4: Yearly Virtues & 365-Day Activity Heatmap
+  // Web Speech Synthesis (Ayah Pronunciation & English Voice Readout)
+  // --------------------------------------------------------------------------
+  function speakCurrentAyah() {
+    const deed = state.deeds.find(d => d.day === state.activeDay);
+    if (!deed) return;
+
+    if (!('speechSynthesis' in window)) {
+      playChimeSound();
+      showToast('Speech synthesis not supported in this browser.', 'ℹ️');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const spokenText = `${deed.reference}. ${deed.translation}. Today's good deed: ${deed.actionItems?.[0]?.text || deed.title}`;
+    const utterance = new SpeechSynthesisUtterance(spokenText);
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => {
+      showToast('Speaking Quranic translation & guidance...', '🔊');
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  // --------------------------------------------------------------------------
+  // VIEW 4: Yearly Virtues & 365-Day Activity Heatmap (True Timestamping)
   // --------------------------------------------------------------------------
   function renderYearlyHeatmap() {
     const grid = document.getElementById('yearlyHeatmapGrid');
     if (!grid) return;
     grid.innerHTML = '';
 
-    // Generate 52 weeks x 7 days = 364/365 cells
     const today = new Date();
     const currentYear = today.getFullYear();
     const startDate = new Date(currentYear, 0, 1);
     let activeDaysCount = 0;
 
-    // Build map of completed days
-    const completedDaysSet = new Set();
+    // Collect all exact completion dates (YYYY-MM-DD)
+    const completedDatesMap = {};
     state.deeds.forEach(d => {
-      if (d.completed) {
-        completedDaysSet.add(d.day);
+      if (d.completed && d.completedAt) {
+        const dateStr = d.completedAt.slice(0, 10);
+        completedDatesMap[dateStr] = (completedDatesMap[dateStr] || 0) + 1;
       }
     });
 
@@ -735,21 +864,21 @@
       const cell = document.createElement('div');
       cell.className = 'heatmap-cell';
 
-      // Hash day of year into 1..30 cycle to show realistic recurring virtue habit
-      const dayCycle = (dayIdx % 30) + 1;
-      const isCompleted = completedDaysSet.has(dayCycle);
+      const isoDate = cellDate.toISOString().slice(0, 10);
+      const isCompleted = !!completedDatesMap[isoDate];
+      const completedCount = completedDatesMap[isoDate] || 0;
 
       if (isCompleted) {
         activeDaysCount++;
-        const level = (dayIdx % 4) + 1;
+        const level = Math.min(4, completedCount);
         cell.setAttribute('data-level', level);
       }
 
       const dateStr = cellDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      cell.title = `${dateStr} — Day ${dayCycle}: ${isCompleted ? 'Completed' : 'Pending'}`;
+      cell.title = `${dateStr}: ${isCompleted ? `${completedCount} deed(s) completed` : 'No recorded activity'}`;
 
       cell.addEventListener('click', () => {
-        showToast(`${dateStr} • Day ${dayCycle}: ${isCompleted ? 'Good deed completed!' : 'Plan: ' + (state.deeds[dayCycle - 1]?.title || '')}`, '🗓️');
+        showToast(`${dateStr} • ${isCompleted ? `${completedCount} good deed(s) completed!` : 'Plan your next deed!'}`, '🗓️');
       });
 
       grid.appendChild(cell);
@@ -782,31 +911,56 @@
   }
 
   // --------------------------------------------------------------------------
-  // Digital Tasbih (Dhikr Companion)
+  // Digital Tasbih (Dhikr Companion with Rounds, Haptics & Progress)
   // --------------------------------------------------------------------------
   function setupTasbih() {
     const display = document.getElementById('tasbihDisplay');
     const countBtn = document.getElementById('tasbihCountBtn');
     const resetBtn = document.getElementById('tasbihResetBtn');
     const targetSelect = document.getElementById('tasbihTargetSelect');
+    const phraseSelect = document.getElementById('tasbihPhraseSelect');
+    const progressFill = document.getElementById('tasbihProgressFill');
+    const roundBadge = document.getElementById('tasbihRoundBadge');
 
     function updateDisplay() {
       if (display) display.textContent = state.tasbihCount;
+      if (roundBadge) roundBadge.textContent = `Round ${state.tasbihRounds}`;
+
+      const target = parseInt(targetSelect?.value || '33', 10);
+      if (progressFill) {
+        if (target < 900) {
+          const currentInRound = state.tasbihCount % target;
+          const pct = Math.min(100, Math.round((currentInRound / target) * 100));
+          progressFill.style.width = `${pct}%`;
+        } else {
+          progressFill.style.width = '100%';
+        }
+      }
+
       localStorage.setItem(STORAGE_KEYS.TASBIH, state.tasbihCount);
+      localStorage.setItem(STORAGE_KEYS.TASBIH_ROUNDS, state.tasbihRounds);
+      localStorage.setItem(STORAGE_KEYS.TASBIH_PHRASE, state.tasbihPhrase);
     }
 
     function incrementTasbih() {
       state.tasbihCount++;
       playTasbihClick();
-      updateDisplay();
 
-      // Check target milestone
+      // Haptic feedback if supported
+      if (navigator.vibrate) {
+        navigator.vibrate(30);
+      }
+
       const target = parseInt(targetSelect?.value || '33', 10);
-      if (state.tasbihCount === target || (state.tasbihCount > 0 && state.tasbihCount % target === 0)) {
+      if (target < 900 && state.tasbihCount > 0 && state.tasbihCount % target === 0) {
+        state.tasbihRounds++;
         playChimeSound();
         triggerConfetti();
-        showToast(`Alhamdulillah! Completed ${state.tasbihCount} Dhikr!`, '📿');
+        if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
+        showToast(`Alhamdulillah! Completed Round ${state.tasbihRounds - 1} (${target} Dhikr)!`, '📿');
       }
+
+      updateDisplay();
     }
 
     if (display) display.addEventListener('click', incrementTasbih);
@@ -815,6 +969,7 @@
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
         state.tasbihCount = 0;
+        state.tasbihRounds = 1;
         updateDisplay();
         showToast('Tasbih counter reset.', '🔄');
       });
@@ -823,13 +978,22 @@
     if (targetSelect) {
       targetSelect.addEventListener('change', (e) => {
         state.tasbihTarget = parseInt(e.target.value, 10);
+        updateDisplay();
       });
     }
 
-    // Spacebar keyboard listener for counting when on daily view
+    if (phraseSelect) {
+      phraseSelect.value = state.tasbihPhrase;
+      phraseSelect.addEventListener('change', (e) => {
+        state.tasbihPhrase = e.target.value;
+        updateDisplay();
+        showToast(`Dhikr set to ${e.target.options[e.target.selectedIndex].text}`, '📿');
+      });
+    }
+
+    // Spacebar listener for counting when on daily view
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space' && state.activeView === 'dailyView') {
-        // Only if not focused in textarea/input
         const activeTag = document.activeElement?.tagName;
         if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
           e.preventDefault();
@@ -888,36 +1052,84 @@
     });
   }
 
+  function updateNextReminderIndicator() {
+    const pill = document.getElementById('nextReminderPill');
+    if (!pill) return;
+
+    const activeReminders = state.reminders.filter(r => r.enabled);
+    if (activeReminders.length === 0) {
+      pill.textContent = 'None';
+      return;
+    }
+
+    const now = new Date();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+
+    let nextRem = null;
+    let minDiff = Infinity;
+
+    activeReminders.forEach(r => {
+      const parts = r.time.split(':').map(Number);
+      const rMin = parts[0] * 60 + parts[1];
+      let diff = rMin - currentMin;
+      if (diff < 0) diff += 24 * 60; // Next day
+      if (diff < minDiff) {
+        minDiff = diff;
+        nextRem = r;
+      }
+    });
+
+    if (nextRem) {
+      pill.textContent = `Next: ${nextRem.time}`;
+    }
+  }
+
   function startReminderChecker() {
-    // Check every 30 seconds
+    updateNextReminderIndicator();
+
     setInterval(() => {
       const now = new Date();
       const currentHours = String(now.getHours()).padStart(2, '0');
       const currentMinutes = String(now.getMinutes()).padStart(2, '0');
       const currentTimeStr = `${currentHours}:${currentMinutes}`;
-      const dayOfWeek = now.getDay(); // 0 is Sunday, 5 is Friday
+      const dayOfWeek = now.getDay();
 
       state.reminders.forEach(rem => {
         if (!rem.enabled) return;
         if (rem.time !== currentTimeStr) return;
 
-        // Check frequency filter
         if (rem.frequency === 'Weekdays' && (dayOfWeek === 0 || dayOfWeek === 6)) return;
         if (rem.frequency === 'Fridays' && dayOfWeek !== 5) return;
 
-        // Guard against duplicate alerts within same minute
         const guardKey = `reminder_fired_${rem.id}_${now.toDateString()}_${currentTimeStr}`;
         if (sessionStorage.getItem(guardKey)) return;
         sessionStorage.setItem(guardKey, 'true');
 
-        // Trigger Notification
         triggerReminderAlert(rem);
       });
-    }, 30000);
+
+      updateNextReminderIndicator();
+    }, 20000);
   }
 
   function triggerReminderAlert(rem) {
     playChimeSound();
+
+    // Trigger Floating In-App Banner
+    const banner = document.getElementById('inAppAlarmBanner');
+    const titleEl = document.getElementById('alarmBannerTitle');
+    const textEl = document.getElementById('alarmBannerText');
+
+    if (banner && titleEl && textEl) {
+      titleEl.textContent = `⏰ ${rem.title}`;
+      textEl.textContent = `Time for your daily Quranic reflection: "${state.deeds[state.activeDay - 1]?.title || 'Daily Good Deed'}"`;
+      banner.classList.add('active');
+
+      setTimeout(() => {
+        banner.classList.remove('active');
+      }, 9000);
+    }
+
     showToast(`⏰ Reminder: ${rem.title}`, '🕌');
 
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -935,22 +1147,50 @@
   // --------------------------------------------------------------------------
   // Modals Management (Modern `<dialog closedby="any">`)
   // --------------------------------------------------------------------------
-  function openEditModal(deedId) {
-    const deed = state.deeds.find(d => d.id === deedId);
-    if (!deed) return;
+  function openEditModal(deedId, isNew = false) {
+    const deed = state.deeds.find(d => d.id === deedId) || state.deeds[0];
+    if (!deed && !isNew) return;
 
     const modal = document.getElementById('editDeedModal');
     if (!modal) return;
 
-    document.getElementById('editDeedId').value = deed.id;
-    document.getElementById('editTitle').value = deed.title;
-    document.getElementById('editCategory').value = deed.category;
-    document.getElementById('editArabic').value = deed.arabic;
-    document.getElementById('editRef').value = deed.reference;
-    document.getElementById('editTranslation').value = deed.translation;
-    document.getElementById('editWisdom').value = deed.wisdom;
+    document.getElementById('editDeedId').value = isNew ? 'new' : deed.id;
+    document.getElementById('editDay').value = isNew ? Math.min(30, state.deeds.length + 1) : deed.day;
+    document.getElementById('editTitle').value = isNew ? '' : deed.title;
+    document.getElementById('editCategory').value = isNew ? 'Speech & Character' : deed.category;
+    document.getElementById('editArabic').value = isNew ? '' : deed.arabic;
+    document.getElementById('editRef').value = isNew ? '' : deed.reference;
+    document.getElementById('editTranslation').value = isNew ? '' : deed.translation;
+    document.getElementById('editWisdom').value = isNew ? '' : deed.wisdom;
+
+    // Render action items list
+    renderEditActionItemsList(isNew ? [] : (deed.actionItems || []));
 
     modal.showModal();
+  }
+
+  function renderEditActionItemsList(items) {
+    const list = document.getElementById('editActionItemsList');
+    if (!list) return;
+
+    list.innerHTML = '';
+    const workingItems = items.length > 0 ? items : [{ text: '' }];
+
+    workingItems.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'action-item-edit-row';
+      row.innerHTML = `
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; width: 16px;">${idx + 1}.</span>
+        <input type="text" class="action-item-edit-input" value="${escapeHtml(item.text || '')}" placeholder="Action step ${idx + 1}..." required>
+        <button type="button" class="btn-remove-action" title="Remove Step">✕</button>
+      `;
+
+      row.querySelector('.btn-remove-action')?.addEventListener('click', () => {
+        row.remove();
+      });
+
+      list.appendChild(row);
+    });
   }
 
   function openDetailModal(deedId) {
@@ -1081,11 +1321,21 @@
       });
     }
 
-    // Search Input
+    // Search Input & Clear Search Button
     const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
     if (searchInput) {
       searchInput.addEventListener('input', (e) => {
         state.searchQuery = e.target.value;
+        renderMonthlyGrid();
+      });
+    }
+
+    if (clearSearchBtn) {
+      clearSearchBtn.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        state.searchQuery = '';
         renderMonthlyGrid();
       });
     }
@@ -1129,31 +1379,75 @@
       });
     }
 
-    // Daily Focus Previous / Next Day Buttons
+    // Daily Focus Previous / Next Day Buttons & Keyboard Navigation
     const prevDayBtn = document.getElementById('prevDayBtn');
     const nextDayBtn = document.getElementById('nextDayBtn');
 
-    if (prevDayBtn) {
-      prevDayBtn.addEventListener('click', () => {
-        state.activeDay = state.activeDay > 1 ? state.activeDay - 1 : 30;
-        localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, state.activeDay);
-        renderDailyFocus();
-      });
+    function navigatePrevDay() {
+      state.activeDay = state.activeDay > 1 ? state.activeDay - 1 : 30;
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, state.activeDay);
+      renderDailyFocus();
     }
 
-    if (nextDayBtn) {
-      nextDayBtn.addEventListener('click', () => {
-        state.activeDay = state.activeDay < 30 ? state.activeDay + 1 : 1;
-        localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, state.activeDay);
-        renderDailyFocus();
-      });
+    function navigateNextDay() {
+      state.activeDay = state.activeDay < 30 ? state.activeDay + 1 : 1;
+      localStorage.setItem(STORAGE_KEYS.ACTIVE_DAY, state.activeDay);
+      renderDailyFocus();
     }
+
+    if (prevDayBtn) prevDayBtn.addEventListener('click', navigatePrevDay);
+    if (nextDayBtn) nextDayBtn.addEventListener('click', navigateNextDay);
+
+    window.addEventListener('keydown', (e) => {
+      if (state.activeView === 'dailyView') {
+        const activeTag = document.activeElement?.tagName;
+        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            navigatePrevDay();
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            navigateNextDay();
+          }
+        }
+      }
+    });
 
     // Daily Focus Big Toggle Complete Button
     const dailyToggleBtn = document.getElementById('dailyToggleCompleteBtn');
     if (dailyToggleBtn) {
       dailyToggleBtn.addEventListener('click', (e) => {
         toggleDeedCompletion(state.activeDay, e.clientX, e.clientY);
+      });
+    }
+
+    // Memorization Assistant Controls
+    const voiceReadoutBtn = document.getElementById('voiceReadoutBtn');
+    if (voiceReadoutBtn) {
+      voiceReadoutBtn.addEventListener('click', speakCurrentAyah);
+    }
+
+    const toggleHideArabicBtn = document.getElementById('toggleHideArabicBtn');
+    if (toggleHideArabicBtn) {
+      toggleHideArabicBtn.addEventListener('click', () => {
+        const frame = document.getElementById('dailyArabicFrame');
+        if (frame) {
+          const isHidden = frame.classList.toggle('hidden-blur');
+          toggleHideArabicBtn.textContent = isHidden ? '👁️ Reveal Arabic' : '👁️ Hide Arabic';
+          showToast(isHidden ? 'Arabic hidden to test your memory!' : 'Arabic revealed!', '🧠');
+        }
+      });
+    }
+
+    const toggleHideTransBtn = document.getElementById('toggleHideTransBtn');
+    if (toggleHideTransBtn) {
+      toggleHideTransBtn.addEventListener('click', () => {
+        const trans = document.getElementById('dailyTranslation');
+        if (trans) {
+          const isHidden = trans.classList.toggle('hidden-blur');
+          toggleHideTransBtn.textContent = isHidden ? '👁️ Reveal Meaning' : '👁️ Hide Meaning';
+          showToast(isHidden ? 'Meaning hidden for recall!' : 'Meaning revealed!', '🧠');
+        }
       });
     }
 
@@ -1197,7 +1491,7 @@
       });
     }
 
-    // Reminders Modal Triggers
+    // Reminders Modal Triggers & Sound Test
     const openRemindersBtn = document.getElementById('openRemindersBtn');
     const remindersModal = document.getElementById('remindersModal');
     const closeRemindersBtn = document.getElementById('closeRemindersModalBtn');
@@ -1211,6 +1505,22 @@
 
     if (closeRemindersBtn && remindersModal) {
       closeRemindersBtn.addEventListener('click', () => remindersModal.close());
+    }
+
+    const testReminderSoundBtn = document.getElementById('testReminderSoundBtn');
+    if (testReminderSoundBtn) {
+      testReminderSoundBtn.addEventListener('click', () => {
+        playChimeSound();
+        showToast('Playing alarm chime test...', '🎵');
+      });
+    }
+
+    // Dismiss In-App Alarm Banner
+    const dismissAlarmBtn = document.getElementById('dismissAlarmBannerBtn');
+    if (dismissAlarmBtn) {
+      dismissAlarmBtn.addEventListener('click', () => {
+        document.getElementById('inAppAlarmBanner')?.classList.remove('active');
+      });
     }
 
     // Request Notification Permission
@@ -1257,22 +1567,57 @@
       });
     }
 
-    // Edit Deed Form Submission
+    // Edit Deed Form Submission & Add Steps
     const editForm = document.getElementById('editDeedForm');
     const editModal = document.getElementById('editDeedModal');
     const closeEditBtn = document.getElementById('closeEditModalBtn');
+    const addStepBtn = document.getElementById('addEditActionItemBtn');
 
     if (closeEditBtn && editModal) {
       closeEditBtn.addEventListener('click', () => editModal.close());
     }
 
+    if (addStepBtn) {
+      addStepBtn.addEventListener('click', () => {
+        const list = document.getElementById('editActionItemsList');
+        if (!list) return;
+        const currentCount = list.children.length;
+        const row = document.createElement('div');
+        row.className = 'action-item-edit-row';
+        row.innerHTML = `
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; width: 16px;">${currentCount + 1}.</span>
+          <input type="text" class="action-item-edit-input" placeholder="New action step..." required>
+          <button type="button" class="btn-remove-action" title="Remove Step">✕</button>
+        `;
+        row.querySelector('.btn-remove-action')?.addEventListener('click', () => row.remove());
+        list.appendChild(row);
+      });
+    }
+
     if (editForm) {
       editForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const deedId = parseInt(document.getElementById('editDeedId').value, 10);
-        const deed = state.deeds.find(d => d.id === deedId);
+        const deedIdVal = document.getElementById('editDeedId').value;
+        const dayVal = parseInt(document.getElementById('editDay').value, 10);
+
+        let deed = null;
+        if (deedIdVal === 'new') {
+          deed = {
+            id: Date.now(),
+            day: dayVal,
+            completed: false,
+            completedAt: null,
+            userNotes: '',
+            actionItems: []
+          };
+          state.deeds.push(deed);
+        } else {
+          deed = state.deeds.find(d => d.id === parseInt(deedIdVal, 10));
+        }
+
         if (!deed) return;
 
+        deed.day = dayVal;
         deed.title = document.getElementById('editTitle').value.trim();
         deed.category = document.getElementById('editCategory').value;
         deed.arabic = document.getElementById('editArabic').value.trim();
@@ -1280,12 +1625,22 @@
         deed.translation = document.getElementById('editTranslation').value.trim();
         deed.wisdom = document.getElementById('editWisdom').value.trim();
 
+        // Collect edited action items
+        const stepInputs = document.querySelectorAll('#editActionItemsList .action-item-edit-input');
+        deed.actionItems = Array.from(stepInputs)
+          .map((input, idx) => ({ id: `${deed.id}-${idx + 1}`, text: input.value.trim(), done: false }))
+          .filter(item => item.text.length > 0);
+
+        if (deed.actionItems.length === 0) {
+          deed.actionItems = [{ id: `${deed.id}-1`, text: deed.title, done: false }];
+        }
+
         saveDeeds();
         editModal.close();
         renderMonthlyGrid();
         renderWeeklyView();
         renderDailyFocus();
-        showToast(`Day ${deed.day} updated successfully!`, '💾');
+        showToast(`Day ${deed.day} saved successfully!`, '💾');
       });
     }
 
@@ -1293,25 +1648,28 @@
     const resetDeedDefaultBtn = document.getElementById('resetDeedDefaultBtn');
     if (resetDeedDefaultBtn) {
       resetDeedDefaultBtn.addEventListener('click', () => {
-        const deedId = parseInt(document.getElementById('editDeedId').value, 10);
+        const deedIdVal = document.getElementById('editDeedId').value;
+        const deedId = parseInt(deedIdVal, 10);
         const defaultDeed = DEFAULT_DEEDS.find(d => d.id === deedId);
         if (!defaultDeed) return;
 
+        document.getElementById('editDay').value = defaultDeed.day;
         document.getElementById('editTitle').value = defaultDeed.title;
         document.getElementById('editCategory').value = defaultDeed.category;
         document.getElementById('editArabic').value = defaultDeed.arabic;
         document.getElementById('editRef').value = defaultDeed.reference;
         document.getElementById('editTranslation').value = defaultDeed.translation;
         document.getElementById('editWisdom').value = defaultDeed.wisdom;
+        renderEditActionItemsList(defaultDeed.actionItems || []);
         showToast('Form fields filled with default Quranic deed.', '🔄');
       });
     }
 
-    // Add Custom Deed Button (opens edit modal with empty state)
+    // Add Custom Deed Button
     const openAddDeedBtn = document.getElementById('openAddDeedBtn');
-    if (openAddDeedBtn && editModal) {
+    if (openAddDeedBtn) {
       openAddDeedBtn.addEventListener('click', () => {
-        openEditModal(state.activeDay);
+        openEditModal(null, true);
       });
     }
 
@@ -1327,12 +1685,13 @@
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
         const exportData = {
-          version: '1.0.0',
+          version: '1.0.1',
           exportedAt: new Date().toISOString(),
           deeds: state.deeds,
           reminders: state.reminders,
           weeklyNotes: state.weeklyNotes,
-          tasbihCount: state.tasbihCount
+          tasbihCount: state.tasbihCount,
+          tasbihRounds: state.tasbihRounds
         };
 
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -1365,6 +1724,7 @@
               if (imported.reminders) state.reminders = imported.reminders;
               if (imported.weeklyNotes) state.weeklyNotes = imported.weeklyNotes;
               if (imported.tasbihCount !== undefined) state.tasbihCount = imported.tasbihCount;
+              if (imported.tasbihRounds !== undefined) state.tasbihRounds = imported.tasbihRounds;
 
               saveDeeds();
               saveReminders();
@@ -1440,6 +1800,7 @@
     setupEventListeners();
     startReminderChecker();
     updateHeroStats();
+    updateCategoryCountBadges();
   }
 
   // Run on DOM ready
