@@ -1,7 +1,7 @@
 // ============================================================================
 // NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner
 // Core Application Logic & Modern Web Interactions
-// Version 1.0.1 (updated 2026-11-01 22:18)
+// Version 1.0.2 (updated 2026-11-02 06:03)
 // ============================================================================
 
 (function() {
