@@ -2,7 +2,28 @@
 
 > *"And whoever does righteous deeds while being a believer - he will have no fear of injustice or deprivation."* — Surah Ta-Ha (20:112)
 
-**NurAl-Amal** (`v1.0.2`) is an interactive, colorful web application and spiritual habit planner designed to help you cultivate 30 transformative daily deeds drawn directly from the Holy Quran. It provides an intuitive, four-tier curriculum: **Monthly Plan**, **Weekly Milestones**, **Daily Focus Mode**, and a **Yearly 365-Day Consistency Heatmap & 12-Month Virtues Roadmap**.
+**NurAl-Amal** (`v1.0.3 (updated 2026-11-03 17:21)`) is an interactive, colorful web application, spiritual habit planner, and Progressive Web App (PWA) designed to help you cultivate 30 transformative daily deeds drawn directly from the Holy Quran. It provides an intuitive, four-tier curriculum: **Monthly Plan**, **Weekly Milestones**, **Daily Focus Mode**, and a **Yearly 365-Day Consistency Heatmap & 12-Month Virtues Roadmap**.
+
+---
+
+## 📱 Mobile Support: Android & iOS Progressive Web App (PWA)
+
+**NurAl-Amal is 100% compatible with both Android and iOS!** It functions as an installable Progressive Web App (PWA) that looks, feels, and behaves like a native mobile app without requiring App Store or Google Play downloads:
+
+- **🍎 Apple iOS (iPhone & iPad)**:
+  1. Open [https://nuralamal.pages.dev](https://nuralamal.pages.dev) in **Safari**.
+  2. Tap the **Share** button (the square with an arrow pointing up ⎋) in the bottom toolbar.
+  3. Scroll down and select **"Add to Home Screen"** (➕).
+  4. Tap **Add**. The app installs with a high-resolution Apple touch icon, opens in standalone fullscreen mode (no browser address bar), and respects iOS safe-area notches and home indicators.
+
+- **🤖 Android (Chrome, Brave, Edge, Samsung Internet)**:
+  1. Open [https://nuralamal.pages.dev](https://nuralamal.pages.dev) in **Google Chrome** (or any Chromium browser).
+  2. Tap the **Install** prompt banner or tap the **three dots menu (⋮)** and select **"Install app"** / **"Add to Home screen"**.
+  3. The app is added directly to your home screen and Android App Drawer with its standalone theme color (`#059669`).
+
+- **⚡ 100% Offline Capability**:
+  - Precached via a custom Service Worker (`sw.js`). All deeds, Arabic calligraphy, theme engines, and the Sheikh Saad Al-Ghamdi audio recitation are available even in airplane mode without internet access.
+  - Native haptic feedback (`navigator.vibrate`) on supported mobile devices when clicking the Tasbih counter.
 
 ---
 
@@ -20,8 +41,10 @@
   - 📚 **Seeking Knowledge** (*'Ilm Nafi'*)
   - 📿 **Worship & Dhikr** (*Dhikrullah & Shukr*)
 
-### 2. 🧠 Ayah Memorization & Audio Assistant
-- **Web Speech Synthesis Recitation**: Listen to English voice audio readout of the Quranic translation and reflection.
+### 2. 🎙️ Sheikh Saad Al-Ghamdi Bismillah Audio & Voice Recitation
+- **Authentic Bismillah Recitation**: The chime has been replaced with the authentic recitation of *Bismillah ar-Rahman ar-Rahim* (Surah Al-Fatihah 1:1) by world-renowned Qari **Sheikh Saad Al-Ghamdi**, sourced from [EveryAyah.com](https://everyayah.com/).
+- **Dual Offline & CDN Fallback**: Cached locally in `audio/bismillah_ghamadi.mp3` for offline PWA use, with seamless fallback to EveryAyah CDN and Web Audio synthesizer.
+- **Web Speech Synthesis Audio**: English voice audio readout of the Quranic translation and reflection.
 - **Transliteration Assistance**: Phonetic readings for every single day to support non-Arabic speakers.
 - **Recall Testing (Flashcard Mode)**: Hide/reveal Arabic script or translation with 1 click to test your memory.
 
@@ -32,9 +55,9 @@
 
 ### 4. ⏰ Daily Reminders & Floating Alarm Banner
 - **Customizable Daily Reminders**: Schedule custom alarms for morning, midday, evening, or night.
-- **In-App Alarm Banner**: Displays an animated floating reminder card with chime sound when an alarm triggers.
+- **In-App Alarm Banner**: Displays an animated floating reminder card playing Sheikh Saad Al-Ghamdi's Bismillah when an alarm triggers.
 - **Push Notification Support**: Browser-level push notification alerts.
-- **Alarm Sound Test**: Test harmonic reflection chimes directly inside the reminders manager.
+- **Alarm Sound Test**: Test the Bismillah audio directly inside the reminders manager.
 
 ### 5. 🎨 Vibrant, Interactive UI & Themes
 - **4 Custom Themes**:
@@ -66,7 +89,8 @@
 ## 🚀 Quick Start
 
 1. Open `index.html` in any modern web browser (Chrome, Edge, Firefox, Safari, Brave).
-2. No build tools, NPM packages, or backend servers required — 100% client-side, offline, and private.
+2. Live production deployment: [https://nuralamal.pages.dev](https://nuralamal.pages.dev)
+3. No build tools, NPM packages, or backend servers required — 100% client-side, offline, and private.
 
 ```bash
 # Optional: Serve with a local HTTP server
@@ -85,3 +109,4 @@ python3 -m http.server 8080
 
 ## 🛡️ Privacy & Offline Guarantee
 All your completion progress, streaks, daily reflections, and customized reminders are saved locally in your browser's `localStorage`. No personal data leaves your device.
+

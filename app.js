@@ -1,7 +1,7 @@
 // ============================================================================
 // NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner
 // Core Application Logic & Modern Web Interactions
-// Version 1.0.2 (updated 2026-11-02 06:03)
+// Version 1.0.3 (updated 2026-11-03 16:07)
 // ============================================================================
 
 (function() {
@@ -42,8 +42,11 @@
   };
 
   // --------------------------------------------------------------------------
-  // Web Audio Chime & Click Synthesizer (No external broken files)
+  // Audio System: Bismillah Recitation (Sheikh Saad Al-Ghamdi — EveryAyah.com)
   // --------------------------------------------------------------------------
+  const BISMILLAH_LOCAL_URL = 'audio/bismillah_ghamadi.mp3';
+  const BISMILLAH_CDN_URL = 'https://everyayah.com/data/Ghamadi_40kbps/001001.mp3';
+  let bismillahAudio = null;
   let audioCtx = null;
 
   function getAudioContext() {
@@ -59,14 +62,13 @@
     return audioCtx;
   }
 
-  function playChimeSound() {
-    if (!state.soundEnabled) return;
+  function playHarmonicSynthChime() {
     try {
       const ctx = getAudioContext();
       if (!ctx) return;
 
       const now = ctx.currentTime;
-      // Harmonic reflection chord (E5, G#5, B5, E6)
+      // Harmonic chord (E5, G#5, B5, E6)
       const frequencies = [659.25, 830.61, 987.77, 1318.51];
 
       frequencies.forEach((freq, idx) => {
@@ -89,6 +91,43 @@
     } catch (err) {
       console.warn('Audio play error:', err);
     }
+  }
+
+  function playBismillahAudio() {
+    if (!state.soundEnabled) return;
+    try {
+      if (!bismillahAudio) {
+        bismillahAudio = new Audio(BISMILLAH_LOCAL_URL);
+        bismillahAudio.preload = 'auto';
+
+        // Fallback to EveryAyah CDN if local file is missing or fails
+        bismillahAudio.onerror = () => {
+          console.warn('Local audio/bismillah_ghamadi.mp3 error, falling back to EveryAyah CDN');
+          bismillahAudio.src = BISMILLAH_CDN_URL;
+          bismillahAudio.play().catch(e => {
+            console.warn('CDN audio play blocked or failed:', e);
+            playHarmonicSynthChime();
+          });
+        };
+      }
+
+      bismillahAudio.currentTime = 0;
+      const promise = bismillahAudio.play();
+      if (promise !== undefined) {
+        promise.catch(err => {
+          console.warn('Bismillah playback blocked by autoplay policy, playing synth chime fallback:', err);
+          playHarmonicSynthChime();
+        });
+      }
+    } catch (err) {
+      console.warn('Audio play exception, fallback to synth chime:', err);
+      playHarmonicSynthChime();
+    }
+  }
+
+  // Alias for backward compatibility across all triggers
+  function playChimeSound() {
+    playBismillahAudio();
   }
 
   function playTasbihClick() {
@@ -1451,12 +1490,12 @@
       });
     }
 
-    // Daily Chime Button
+    // Daily Bismillah Recitation Button (Sheikh Saad Al-Ghamdi — EveryAyah.com)
     const dailyAudioBtn = document.getElementById('dailyAudioChimeBtn');
     if (dailyAudioBtn) {
       dailyAudioBtn.addEventListener('click', () => {
-        playChimeSound();
-        showToast('Peaceful reflection chime playing...', '🔔');
+        playBismillahAudio();
+        showToast('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ — Sheikh Saad Al-Ghamdi', '🎙️');
       });
     }
 
@@ -1510,9 +1549,24 @@
     const testReminderSoundBtn = document.getElementById('testReminderSoundBtn');
     if (testReminderSoundBtn) {
       testReminderSoundBtn.addEventListener('click', () => {
-        playChimeSound();
-        showToast('Playing alarm chime test...', '🎵');
+        playBismillahAudio();
+        showToast('Playing Bismillah (Sheikh Saad Al-Ghamdi)...', '🎙️');
       });
+    }
+
+    // Mobile PWA Install Guide Modal Triggers
+    const mobileInstallGuideBtn = document.getElementById('mobileInstallGuideBtn');
+    const installGuideModal = document.getElementById('installGuideModal');
+    const closeInstallGuideBtn = document.getElementById('closeInstallGuideBtn');
+
+    if (mobileInstallGuideBtn && installGuideModal) {
+      mobileInstallGuideBtn.addEventListener('click', () => {
+        installGuideModal.showModal();
+      });
+    }
+
+    if (closeInstallGuideBtn && installGuideModal) {
+      closeInstallGuideBtn.addEventListener('click', () => installGuideModal.close());
     }
 
     // Dismiss In-App Alarm Banner
@@ -1808,6 +1862,19 @@
     document.addEventListener('DOMContentLoaded', bootstrap);
   } else {
     bootstrap();
+  }
+
+  // Register PWA Service Worker for Offline Android & iOS Experience
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => {
+          console.log('NurAl-Amal ServiceWorker active on scope:', reg.scope);
+        })
+        .catch(err => {
+          console.warn('ServiceWorker registration note:', err);
+        });
+    });
   }
 
 })();

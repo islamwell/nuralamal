@@ -2,11 +2,22 @@
 <html lang="en" data-theme="emerald" data-mode="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner</title>
-  <meta name="description" content="A vibrant 30-day Quranic good deed curriculum and spiritual habit planner with monthly, weekly, daily focus, and yearly plans. Editable with custom daily reminders.">
+  <meta name="description" content="A vibrant 30-day Quranic good deed curriculum and spiritual habit planner with daily reminders, Bismillah recitation by Saad Al-Ghamdi, and digital tasbih.">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌙</text></svg>">
+
+  <!-- Progressive Web App (PWA) & Mobile Capabilities for Android & iOS -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#059669">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="NurAl-Amal">
+  <meta name="format-detection" content="telephone=no">
 </head>
 <body>
 
@@ -39,8 +50,13 @@
         </button>
 
         <!-- Sound Audio FX Toggle -->
-        <button class="btn-icon" id="soundToggleBtn" title="Toggle Sound Chimes" aria-label="Toggle audio effects">
+        <button class="btn-icon" id="soundToggleBtn" title="Toggle Audio (Bismillah by Saad Al-Ghamdi)" aria-label="Toggle audio effects">
           <span id="soundIcon">🔔</span>
+        </button>
+
+        <!-- Install on Mobile (Android & iOS) -->
+        <button class="btn-icon" id="mobileInstallGuideBtn" title="How to run/install on Android & iOS" aria-label="Install on Mobile">
+          <span>📲</span>
         </button>
 
         <!-- Notification Bell & Reminders Button -->
@@ -230,7 +246,7 @@
             <span class="day-badge" id="dailyBadge">Day 1</span>
             <span class="category-tag emerald" id="dailyCategory">Speech & Character</span>
             <button class="btn-mini" id="dailyEditTrigger">✏️ Edit Deed</button>
-            <button class="btn-mini" id="dailyAudioChimeBtn">🔔 Recite / Chime</button>
+            <button class="btn-mini" id="dailyAudioChimeBtn" title="Play Bismillah by Sheikh Saad Al-Ghamdi (EveryAyah.com)">🎙️ Bismillah (Ghamdi)</button>
           </div>
 
           <h2 class="daily-focus-title" id="dailyTitle">Speak Kindly to All People</h2>
@@ -486,7 +502,7 @@
             <span>🔔</span> Push Alerts
           </button>
           <button class="btn-secondary" id="testReminderSoundBtn" style="justify-content: center;">
-            <span>🎵</span> Test Sound
+            <span>🎙️</span> Test Bismillah
           </button>
         </div>
       </div>
@@ -548,6 +564,64 @@
     </div>
   </dialog>
 
+  <!-- ======================================================================
+       MODAL 4: Mobile App Installation Guide (Android & iOS PWA)
+       ====================================================================== -->
+  <dialog id="installGuideModal" closedby="any" aria-labelledby="installGuideModalTitle">
+    <div class="dialog-inner">
+      <div class="dialog-header">
+        <h3 id="installGuideModalTitle">📲 Run on Android &amp; iOS</h3>
+        <button class="dialog-close-btn" id="closeInstallGuideBtn" aria-label="Close dialog">✕</button>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.75rem;">
+          <strong>Yes! NurAl-Amal runs seamlessly on both Android and iOS devices.</strong> You can add it directly to your home screen as a high-performance standalone Progressive Web App (PWA).
+        </p>
+      </div>
+
+      <div class="install-guide-grid">
+        <!-- iOS Instructions -->
+        <div class="install-platform-card ios">
+          <div class="platform-badge apple">🍎 Apple iPhone &amp; iPad (iOS Safari)</div>
+          <ol class="platform-steps">
+            <li>Open <code style="font-size: 0.8rem; background: var(--bg-subtle); padding: 0.15rem 0.35rem; border-radius: 4px;">https://nuralamal.pages.dev</code> in <strong>Safari</strong>.</li>
+            <li>Tap the <strong>Share</strong> button (the box with an upward arrow ⎋) in the Safari toolbar.</li>
+            <li>Scroll down and tap <strong>"Add to Home Screen"</strong> (➕).</li>
+            <li>Tap <strong>Add</strong>. It will appear on your Home Screen with a custom gold-emerald icon!</li>
+          </ol>
+        </div>
+
+        <!-- Android Instructions -->
+        <div class="install-platform-card android">
+          <div class="platform-badge google">🤖 Android (Chrome / Brave / Edge / Samsung)</div>
+          <ol class="platform-steps">
+            <li>Open the link in <strong>Google Chrome</strong> (or your preferred Android browser).</li>
+            <li>Tap the <strong>three dots menu (⋮)</strong> in the top right.</li>
+            <li>Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+            <li>Confirm installation. The app installs to your app drawer and opens full-screen!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="wisdom-box" style="margin-top: 1.25rem;">
+        <h4>🌟 Native Mobile Features Included</h4>
+        <ul style="padding-left: 1.2rem; font-size: 0.82rem; color: var(--text-main); line-height: 1.6;">
+          <li><strong>100% Offline PWA:</strong> Precached via Service Worker with full offline data storage.</li>
+          <li><strong>Bismillah Audio:</strong> Offline Sheikh Saad Al-Ghamdi recitation without data charges.</li>
+          <li><strong>Haptic Touch:</strong> Tactile vibration pulses for the Tasbih and milestone achievements.</li>
+          <li><strong>Standalone Mode:</strong> Runs without browser search bars or toolbars.</li>
+        </ul>
+      </div>
+
+      <div class="form-actions" style="margin-top: 1.25rem;">
+        <button type="button" class="btn-primary" onclick="document.getElementById('installGuideModal').close()" style="width: 100%; justify-content: center;">
+          Got It, Alhamdulillah!
+        </button>
+      </div>
+    </div>
+  </dialog>
+
   <!-- In-App Floating Alarm Banner -->
   <div class="alarm-banner" id="inAppAlarmBanner" role="alert">
     <div class="alarm-icon">🕌</div>
@@ -576,7 +650,7 @@
 
       <div class="footer-center">
         <!-- Semantic version placeholder adhering strictly to system rules -->
-        <div class="footer-version" id="footerVersionBadge">v1.0.2 (updated 2026-11-02 06:03)</div>
+        <div class="footer-version" id="footerVersionBadge">v1.0.3 (updated 2026-11-03 17:21)</div>
         <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem;">
           100% Private &amp; Offline. Data saved in LocalStorage.
         </div>
