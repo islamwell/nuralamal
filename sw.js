@@ -3,7 +3,7 @@
 // Enables 100% Offline PWA Experience on Android & iOS
 // ============================================================================
 
-const CACHE_NAME = 'nuralamal-cache-v1.0.3';
+const CACHE_NAME = 'nuralamal-cache-v1.0.4';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -42,7 +42,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   // Stale-while-revalidate for local assets, network-first for external APIs
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

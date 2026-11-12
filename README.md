@@ -2,7 +2,7 @@
 
 > *"And whoever does righteous deeds while being a believer - he will have no fear of injustice or deprivation."* — Surah Ta-Ha (20:112)
 
-**NurAl-Amal** (`v1.0.3 (updated 2026-11-03 17:21)`) is an interactive, colorful web application, spiritual habit planner, and Progressive Web App (PWA) designed to help you cultivate 30 transformative daily deeds drawn directly from the Holy Quran. It provides an intuitive, four-tier curriculum: **Monthly Plan**, **Weekly Milestones**, **Daily Focus Mode**, and a **Yearly 365-Day Consistency Heatmap & 12-Month Virtues Roadmap**.
+**NurAl-Amal** (`v1.0.4 (updated 2026-11-12 22:41)`) is an interactive, colorful web application, spiritual habit planner, and Progressive Web App (PWA) designed to help you cultivate 30 transformative daily deeds drawn directly from the Holy Quran. It provides an intuitive, four-tier curriculum: **Monthly Plan**, **Weekly Milestones**, **Daily Focus Mode**, and a **Yearly 365-Day Consistency Heatmap & 12-Month Virtues Roadmap**.
 
 ---
 

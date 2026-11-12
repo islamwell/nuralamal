@@ -1,7 +1,7 @@
 // ============================================================================
 // NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner
 // Core Application Logic & Modern Web Interactions
-// Version 1.0.3 (updated 2026-11-03 16:07)
+// Version 1.0.4 (updated 2026-11-12 22:41)
 // ============================================================================
 
 (function() {
@@ -57,7 +57,7 @@
       }
     }
     if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+      audioCtx.resume().catch(() => {});
     }
     return audioCtx;
   }
@@ -97,11 +97,17 @@
     if (!state.soundEnabled) return;
     try {
       if (!bismillahAudio) {
+        let triedCdnFallback = false;
         bismillahAudio = new Audio(BISMILLAH_LOCAL_URL);
         bismillahAudio.preload = 'auto';
 
-        // Fallback to EveryAyah CDN if local file is missing or fails
+        // Fallback once to EveryAyah CDN if local file is missing or fails
         bismillahAudio.onerror = () => {
+          if (triedCdnFallback) {
+            playHarmonicSynthChime();
+            return;
+          }
+          triedCdnFallback = true;
           console.warn('Local audio/bismillah_ghamadi.mp3 error, falling back to EveryAyah CDN');
           bismillahAudio.src = BISMILLAH_CDN_URL;
           bismillahAudio.play().catch(e => {
@@ -111,7 +117,9 @@
         };
       }
 
-      bismillahAudio.currentTime = 0;
+      if (bismillahAudio.readyState > 0) {
+        bismillahAudio.currentTime = 0;
+      }
       const promise = bismillahAudio.play();
       if (promise !== undefined) {
         promise.catch(err => {
@@ -278,8 +286,9 @@
   function initData() {
     try {
       const savedDeeds = localStorage.getItem(STORAGE_KEYS.DEEDS);
-      if (savedDeeds) {
-        state.deeds = JSON.parse(savedDeeds);
+      const parsedDeeds = savedDeeds ? JSON.parse(savedDeeds) : null;
+      if (Array.isArray(parsedDeeds) && parsedDeeds.length > 0) {
+        state.deeds = parsedDeeds;
       } else if (typeof DEFAULT_DEEDS !== 'undefined') {
         state.deeds = JSON.parse(JSON.stringify(DEFAULT_DEEDS));
       }
@@ -303,8 +312,9 @@
 
     try {
       const savedReminders = localStorage.getItem(STORAGE_KEYS.REMINDERS);
-      if (savedReminders) {
-        state.reminders = JSON.parse(savedReminders);
+      const parsedReminders = savedReminders ? JSON.parse(savedReminders) : null;
+      if (Array.isArray(parsedReminders)) {
+        state.reminders = parsedReminders;
       } else if (typeof DEFAULT_REMINDERS !== 'undefined') {
         state.reminders = JSON.parse(JSON.stringify(DEFAULT_REMINDERS));
       }
@@ -314,8 +324,9 @@
 
     try {
       const savedWeeklyNotes = localStorage.getItem(STORAGE_KEYS.WEEKLY_NOTES);
-      if (savedWeeklyNotes) {
-        state.weeklyNotes = JSON.parse(savedWeeklyNotes);
+      const parsedWeeklyNotes = savedWeeklyNotes ? JSON.parse(savedWeeklyNotes) : null;
+      if (parsedWeeklyNotes && typeof parsedWeeklyNotes === 'object' && !Array.isArray(parsedWeeklyNotes)) {
+        state.weeklyNotes = parsedWeeklyNotes;
       } else {
         state.weeklyNotes = { 1: '', 2: '', 3: '', 4: '', 5: '' };
       }
@@ -327,9 +338,11 @@
     state.theme = localStorage.getItem(STORAGE_KEYS.THEME) || 'emerald';
     state.mode = localStorage.getItem(STORAGE_KEYS.MODE) || 'light';
     state.soundEnabled = localStorage.getItem(STORAGE_KEYS.SOUND) !== 'false';
-    state.tasbihCount = parseInt(localStorage.getItem(STORAGE_KEYS.TASBIH) || '0', 10);
+    const parsedTasbih = parseInt(localStorage.getItem(STORAGE_KEYS.TASBIH) || '0', 10);
+    state.tasbihCount = Number.isFinite(parsedTasbih) && parsedTasbih >= 0 ? parsedTasbih : 0;
     state.tasbihPhrase = localStorage.getItem(STORAGE_KEYS.TASBIH_PHRASE) || 'SubhanAllah';
-    state.tasbihRounds = parseInt(localStorage.getItem(STORAGE_KEYS.TASBIH_ROUNDS) || '1', 10);
+    const parsedRounds = parseInt(localStorage.getItem(STORAGE_KEYS.TASBIH_ROUNDS) || '1', 10);
+    state.tasbihRounds = Number.isFinite(parsedRounds) && parsedRounds >= 1 ? parsedRounds : 1;
 
     const savedActiveDay = parseInt(localStorage.getItem(STORAGE_KEYS.ACTIVE_DAY) || '0', 10);
     if (savedActiveDay >= 1 && savedActiveDay <= 30) {
@@ -1205,7 +1218,7 @@
     // Render action items list
     renderEditActionItemsList(isNew ? [] : (deed.actionItems || []));
 
-    modal.showModal();
+    if (!modal.open) modal.showModal();
   }
 
   function renderEditActionItemsList(items) {
@@ -1281,7 +1294,7 @@
       }
     };
 
-    modal.showModal();
+    if (!modal.open) modal.showModal();
   }
 
   // --------------------------------------------------------------------------
@@ -1538,7 +1551,7 @@
     if (openRemindersBtn && remindersModal) {
       openRemindersBtn.addEventListener('click', () => {
         renderRemindersList();
-        remindersModal.showModal();
+        if (!remindersModal.open) remindersModal.showModal();
       });
     }
 
@@ -1561,7 +1574,7 @@
 
     if (mobileInstallGuideBtn && installGuideModal) {
       mobileInstallGuideBtn.addEventListener('click', () => {
-        installGuideModal.showModal();
+        if (!installGuideModal.open) installGuideModal.showModal();
       });
     }
 
