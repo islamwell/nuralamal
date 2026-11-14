@@ -464,7 +464,7 @@ const DEFAULT_DEEDS = [
     id: 20,
     day: 20,
     transliteration: "Alaa bi-dhikril-laahi tatma'innul-quloob",
-    title: "Tranquilize Your Heart with Dhikr",
+    title: "With the remembrance of Allah, Hearts Find Rest.",
     arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
     reference: "Surah Ar-Ra'd (13:28)",
     translation: "Unquestionably, by the remembrance of Allah hearts are assured.",

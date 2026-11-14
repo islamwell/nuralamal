@@ -3,7 +3,7 @@
 // Enables 100% Offline PWA Experience on Android & iOS
 // ============================================================================
 
-const CACHE_NAME = 'nuralamal-cache-v1.0.4';
+const CACHE_NAME = 'nuralamal-cache-v1.0.5';
 const STATIC_ASSETS = [
   './',
   './index.html',

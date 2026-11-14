@@ -1,7 +1,7 @@
 // ============================================================================
 // NurAl-Amal (نور العمل) — 30 Days of Quranic Good Deeds & Habit Planner
 // Core Application Logic & Modern Web Interactions
-// Version 1.0.4 (updated 2026-11-12 22:41)
+// Version 1.0.5 (updated 2026-11-14 08:41)
 // ============================================================================
 
 (function() {
@@ -297,12 +297,17 @@
       state.deeds = JSON.parse(JSON.stringify(DEFAULT_DEEDS));
     }
 
-    // Ensure all deeds have transliteration & valid actionItems
+    // Ensure all deeds have transliteration & valid actionItems, and update old default titles if unchanged
     if (typeof DEFAULT_DEEDS !== 'undefined') {
       state.deeds.forEach(d => {
-        if (!d.transliteration) {
-          const def = DEFAULT_DEEDS.find(item => item.id === d.id);
-          if (def && def.transliteration) d.transliteration = def.transliteration;
+        const def = DEFAULT_DEEDS.find(item => item.id === d.id);
+        if (def) {
+          if (!d.transliteration && def.transliteration) {
+            d.transliteration = def.transliteration;
+          }
+          if (d.id === 20 && d.title === "Tranquilize Your Heart with Dhikr") {
+            d.title = def.title;
+          }
         }
         if (!d.actionItems || !Array.isArray(d.actionItems)) {
           d.actionItems = [{ id: `${d.id}-1`, text: d.title, done: false }];
